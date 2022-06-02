@@ -108,9 +108,9 @@ Route::middleware(['verified'])->group(function (){
     Route::post('/profile/upload', 'ProfileController@UploadProfilePicture')->name('profile.upload');
 
 
-    Route::post('/online/query', 'QueryController@StoreOnlineQuery')->name('online.query');
+    Route::post('/online/query', 'QueryController@StoreOnlineQuery')->name('store.online.query');
 
-    Route::post('/offline/query', 'QueryController@StoreOfflineQuery')->name('offline.query');
+    Route::post('/offline/query', 'QueryController@StoreOfflineQuery')->name('store.offline.query');
 
     Route::post('/online/submit', 'QueryController@SubmitQuery')->name('online.submit');
 
