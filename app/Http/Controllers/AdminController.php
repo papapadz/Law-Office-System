@@ -39,7 +39,7 @@ class AdminController extends Controller
 
     public function feedbacks()
     {
-        $feedbacks = Feedback::all();
+        $feedbacks = Feedback::paginate(10); /** set pagination */
 
         return view('admin.feedbacks', compact('feedbacks'));
     }
@@ -197,7 +197,7 @@ class AdminController extends Controller
     public function AccountList($id)
     {
         // $queries = Query::where('transaction_number', $id)->get();
-        $users = User::where('role_id', $id)->get();
+        $users = User::where('role_id', $id)->simplePaginate(2);
         $ids = $id;
 
 

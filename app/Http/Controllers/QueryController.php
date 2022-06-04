@@ -121,6 +121,25 @@ class QueryController extends Controller
             'available_time_3' =>'required'
         ]);
 
+        /**Checks each given available time for duplicates */
+        $available_date_array = [request()->available_date_1,request()->available_date_2,request()->available_date_3];
+        $available_time_array = [request()->available_time_1,request()->available_time_2,request()->available_time_3];
+        
+        foreach($available_date_array as $i => $row) {
+            for($j=1;$j<=3;$j++) {
+                $counter = Query::where([
+                    ['client_id',auth()->user()->id],
+                    ['available_date_'.$j,$row],
+                    ['available_time_'.$j,$available_time_array[$i]]
+                ])
+                ->count();
+
+                if($counter>0)
+                    return back()->withErrors(
+                        ['schedule' => 'Duplicate appointment on '.$row.' '.$available_time_array[$i]]);
+            }
+        }
+        /** end checking */
         
         $randon_number = random_int(100000, 999999);
 
