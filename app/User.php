@@ -7,7 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Contracts\Auditable;
 
-class User extends Authenticatable implements MustVerifyEmail, Auditable
+/** used for forgot password */
+use Illuminate\Contracts\Auth\CanResetPassword;
+//
+
+class User extends Authenticatable implements MustVerifyEmail, Auditable, CanResetPassword
 {
     use \OwenIt\Auditing\Auditable;
 

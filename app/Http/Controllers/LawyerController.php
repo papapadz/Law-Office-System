@@ -251,6 +251,9 @@ class LawyerController extends Controller
 
             if(request()->attach_file != NULL)
             {
+                $request->validate([
+                    'attach_file' => 'required|mimes:pdf,docx,jpg,bmp,png' /** restrict file uploads to PDF, Word document and Images */
+                ]);
                  $attached_file = request()->file('attach_file')->storeOnCloudinary('attach_files/')->getSecurePath();
             }
             else
@@ -286,14 +289,17 @@ class LawyerController extends Controller
             }
             else
             {
-               $attached_file = request()->file('attach_file')->storeOnCloudinary('attach_files/')->getSecurePath();
+                $request->validate([
+                    'attach_file' => 'required|mimes:pdf,docx,jpg,bmp,png' /** restrict file uploads to PDF, Word document and Images */
+                ]);
+                $attached_file = request()->file('attach_file')->storeOnCloudinary('attach_files/')->getSecurePath();
 
-               $details = [
-                'title' =>'Written Resolution Reply',
-                'from' => 'Atty. ' .$queries->lawyer->first_name.' ' .$queries->lawyer->last_name,
-                'transactionNumber' => $request->transaction_number,
-                'body' => $request->body,
-                'attach_file' => $attached_file  
+                $details = [
+                    'title' =>'Written Resolution Reply',
+                    'from' => 'Atty. ' .$queries->lawyer->first_name.' ' .$queries->lawyer->last_name,
+                    'transactionNumber' => $request->transaction_number,
+                    'body' => $request->body,
+                    'attach_file' => $attached_file  
             ];               
             \Mail::to($to)->send(new FeedbackMail($details));
         }

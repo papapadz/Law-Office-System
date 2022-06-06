@@ -39,20 +39,20 @@ class AdminController extends Controller
 
     public function feedbacks()
     {
-        $feedbacks = Feedback::paginate(10); /** set pagination */
+        $feedbacks = Feedback::simplePaginate(10); /** create pagination by 10 items each page */; /** set pagination */
 
         return view('admin.feedbacks', compact('feedbacks'));
     }
 
     public function payments()
     {
-        $payments = Query::where('is_payment_verified', '0')->get();  
+        $payments = Query::where('is_payment_verified', '0')->simplePaginate(10); /** create pagination by 10 items each page */ 
         return view('admin.payments', compact('payments'));
     }
 
     public function Inquiries()
     {
-        $contacts = ContactUs::all();
+        $contacts = ContactUs::simplePaginate(10); /** create pagination by 10 items each page */
 
         return view('admin.inquiries', compact('contacts'));
     }
@@ -179,7 +179,7 @@ class AdminController extends Controller
     public function AdminQueryType($type)
     {
         // $queries = Query::where('transaction_number', $id)->get();
-        $queries = Query::where('status', $type)->with('lawyer', 'client')->get();
+        $queries = Query::where('status', $type)->with('lawyer', 'client')->simplePaginate(10); /** create pagination by 10 items each page */
         
 
         return view('admin.queries', compact('queries'));
@@ -197,7 +197,7 @@ class AdminController extends Controller
     public function AccountList($id)
     {
         // $queries = Query::where('transaction_number', $id)->get();
-        $users = User::where('role_id', $id)->simplePaginate(2);
+        $users = User::where('role_id', $id)->simplePaginate(10); /** create pagination by 10 items each page */
         $ids = $id;
 
 
@@ -391,7 +391,7 @@ class AdminController extends Controller
 
     public function Audits()
     {
-       $audits = Audit::all();
+       $audits = Audit::simplePaginate(10); /** create pagination by 10 items each page */
         return view('admin.audit', compact('audits'));
     }
 }

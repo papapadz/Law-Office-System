@@ -54,7 +54,7 @@ return [
 
     //'url' => env('APP_URL', 'https://isproj2b.benilde.edu.ph/OnCon'),
 
-    'url' => env('APP_URL','http://localhost'),
+    'url' => env('APP_URL','http://localhost:8000'),
 
     'asset_url' => env('ASSET_URL', null),
 
@@ -69,7 +69,7 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    'timezone' => 'Asia/Manila',
 
     /*
     |--------------------------------------------------------------------------
