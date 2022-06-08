@@ -178,6 +178,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
+        /** for captcha */
+        //Mews\Captcha\CaptchaServiceProvider::class,
     ],
 
     /*
@@ -230,6 +232,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Alert' => RealRashid\SweetAlert\Facades\Alert::class,
+        /** for captcha */
+        //'Captcha' => Mews\Captcha\Facades\Captcha::class,
     ],
 
 ];

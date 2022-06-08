@@ -59,6 +59,7 @@ class RegisterController extends Controller
             'availability' =>['required_if:role_id,2'],
             'location' =>['required_if:role_id,2'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'captcha' => ['required','captcha'], /** captcha */
             'policy' => ['required'] /** require policy input checkbox */
         ],[
             'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
@@ -125,5 +126,10 @@ class RegisterController extends Controller
         
 
        
+    }
+
+    public function reloadCaptcha()
+    {
+        return response()->json(['captcha'=> captcha_img()]);
     }
 }

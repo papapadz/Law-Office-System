@@ -137,3 +137,6 @@ Route::get('/get-token', 'TokenController@GetToken')->name('get.token');
 Route::get('/create-event', 'TokenController@CreateEvent')->name('create.event');
 
     // Route::post('/online/query', 'QueryController@StoreOnlineQuery')->name('online.query');
+
+/** Route for new captcha */
+Route::get('/reload-captcha', [App\Http\Controllers\Auth\RegisterController::class, 'reloadCaptcha']);

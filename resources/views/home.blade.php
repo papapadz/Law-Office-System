@@ -102,6 +102,8 @@
 </div>
 
 <!-- Modal -->
+@guest
+@else
 <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
@@ -149,7 +151,7 @@
       </div>
     </div>
 </div>
-
+@endguest
 @endsection
 
 @section('scripts')

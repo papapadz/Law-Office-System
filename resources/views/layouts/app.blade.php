@@ -18,10 +18,8 @@
         <link href="{{ asset('css/main.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
-
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.12.1/datatables.min.css"/>
  
-
     </head>
  <body class="main-bg-color">
     <div id="preloader">
@@ -117,6 +115,12 @@
 </main>
 </div>
 
+<!-- Scripts -->
+{{-- <script src="{{ asset('js/app.js') }}" defer></script> --}}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
 <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script>
     AOS.init();
@@ -130,16 +134,13 @@
         loader.style.display = "none"
     })
 </script>
-<!-- Scripts -->
-<script src="{{ asset('js/app.js') }}"></script>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="https://use.fontawesome.com/ef5b8efae4.js"></script>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.12.1/datatables.min.js"></script>
 
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.12.1/datatables.min.js" defer></script>
 <script>
  $(document).ready(function(){
         $('input[type="radio"]').click(function(){
