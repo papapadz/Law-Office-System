@@ -137,8 +137,3 @@ Route::get('/get-token', 'TokenController@GetToken')->name('get.token');
 Route::get('/create-event', 'TokenController@CreateEvent')->name('create.event');
 
     // Route::post('/online/query', 'QueryController@StoreOnlineQuery')->name('online.query');
-
-/** Forgot password */
-Route::get('/forgot-password/{token}', function ($token) {
-    return view('auth.passwords.reset', ['token' => $token]);
-})->middleware('guest')->name('password.request');

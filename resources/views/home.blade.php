@@ -101,4 +101,63 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12 h-100 fill">
+                    <div class="container text-center text-primary-color">
+                        <h3 class="mx-auto font-weight-bold" style="font-size: 4vw;">
+                            WHAT WE OFFER
+                        </h3>
+                    </div>
+                </div>
+                <div class="col-md-12 bg-primary-color h-100 fill p-5" >
+                    <div class="container text-center">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a class="text-decoration-none" href="{{ route('online') }}">
+                                <div class="card">
+                                    <div class="card-body pb-5">
+                                        <i class="fa fa-video-camera fa-4x fa-md mx-auto text-primary-color"></i>
+                                        <h5 class="text-center mt-4">
+                                            ONLINE CONSULTATION
+                                        </h5>
+                                    </div>
+                                </div>
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a class="text-decoration-none" href="{{ route('offline') }}">
+                                <div class="card">
+                                    <div class="card-body pb-5">
+                                        <i class="fa fa-calendar fa-4x fa-md mx-auto text-primary-color"></i>
+                                        <h5 class="text-center mt-4">
+                                            RESERVATION SCHEDULE
+                                        </h5>
+                                    </div>
+                                </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script type="text/javascript">
+    
+    $(window).on('load', function() {
+        $('#welcomeModal').modal('show')
+    });
+    
+</script>
 @endsection

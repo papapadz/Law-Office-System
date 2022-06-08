@@ -37,7 +37,6 @@
                     		@endforeach
                     	</tbody>
                     </table>
-					{{ $payments->links() }}
             </div>
         </div>
     </div>

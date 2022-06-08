@@ -32,7 +32,6 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        {{ $audits->links() }}
                     </div>
                 </div>
             </div>

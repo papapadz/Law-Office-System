@@ -39,20 +39,20 @@ class AdminController extends Controller
 
     public function feedbacks()
     {
-        $feedbacks = Feedback::simplePaginate(10); /** create pagination by 10 items each page */; /** set pagination */
+        $feedbacks = Feedback::get();
 
         return view('admin.feedbacks', compact('feedbacks'));
     }
 
     public function payments()
     {
-        $payments = Query::where('is_payment_verified', '0')->simplePaginate(10); /** create pagination by 10 items each page */ 
+        $payments = Query::where('is_payment_verified', '0')->get(); 
         return view('admin.payments', compact('payments'));
     }
 
     public function Inquiries()
     {
-        $contacts = ContactUs::simplePaginate(10); /** create pagination by 10 items each page */
+        $contacts = ContactUs::get();
 
         return view('admin.inquiries', compact('contacts'));
     }
@@ -179,7 +179,7 @@ class AdminController extends Controller
     public function AdminQueryType($type)
     {
         // $queries = Query::where('transaction_number', $id)->get();
-        $queries = Query::where('status', $type)->with('lawyer', 'client')->simplePaginate(10); /** create pagination by 10 items each page */
+        $queries = Query::where('status', $type)->with('lawyer', 'client')->get();
         
 
         return view('admin.queries', compact('queries'));
@@ -197,7 +197,7 @@ class AdminController extends Controller
     public function AccountList($id)
     {
         // $queries = Query::where('transaction_number', $id)->get();
-        $users = User::where('role_id', $id)->simplePaginate(10); /** create pagination by 10 items each page */
+        $users = User::where('role_id', $id)->get();
         $ids = $id;
 
 
@@ -391,7 +391,7 @@ class AdminController extends Controller
 
     public function Audits()
     {
-       $audits = Audit::simplePaginate(10); /** create pagination by 10 items each page */
+       $audits = Audit::get();
         return view('admin.audit', compact('audits'));
     }
 }

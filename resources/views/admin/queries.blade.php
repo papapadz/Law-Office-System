@@ -35,7 +35,6 @@
                     		@endforeach
                     	</tbody>
                     </table>
-					{{ $queries->links() }}
             </div>
         </div>
     </div>

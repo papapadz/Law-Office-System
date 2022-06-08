@@ -9,38 +9,20 @@
 
         <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Scripts -->
-        <script src="{{ asset('js/app.js') }}" defer></script>
-
         <!-- Fonts -->
         <link rel="dns-prefetch" href="//fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
 
         <!-- Styles -->
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
         <link href="{{ asset('css/main.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
 
-        <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
-        <script src="https://use.fontawesome.com/ef5b8efae4.js"></script>
 
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.12.1/datatables.min.css"/>
+ 
 
-        <script>
-         $(document).ready(function(){
-                $('input[type="radio"]').click(function(){
-                    var inputValue = $(this).attr("id");
-                    var resoType = $("." + inputValue);
-                    $(".type").not(resoType).hide();
-                    $(resoType).show();
-                });
-            });
-        </script>
-
-
- </head>
+    </head>
  <body class="main-bg-color">
     <div id="preloader">
         <div class="text-center">
@@ -148,5 +130,30 @@
         loader.style.display = "none"
     })
 </script>
+<!-- Scripts -->
+<script src="{{ asset('js/app.js') }}"></script>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script src="https://use.fontawesome.com/ef5b8efae4.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.12.1/datatables.min.js" defer></script>
+<script>
+ $(document).ready(function(){
+        $('input[type="radio"]').click(function(){
+            var inputValue = $(this).attr("id");
+            var resoType = $("." + inputValue);
+            $(".type").not(resoType).hide();
+            $(resoType).show();
+        });
+    });
+</script>
+
+<script>
+    $('table').DataTable()
+</script>
+@yield('scripts')
 </body>
 </html>
