@@ -625,7 +625,7 @@
                                     <div class="form-group row">
                                         <div class="mx-auto">
                                             @if($query->status == 'In-Progress' )
-                                            <button name="action" value="complete" class="btn btn-primary-btn text-white">
+                                            <button name="action" value="complete" class="btn btn-primary-btn text-white" @if(Carbon\Carbon::parse($event_check->end_time)->gte(Carbon\Carbon::now())) disabled @endif>
                                                 Complete
                                             </button>
                                             @elseif($query->resolution_type == 'Written Resolution from a Lawyer' && $query->status != 'Complete')

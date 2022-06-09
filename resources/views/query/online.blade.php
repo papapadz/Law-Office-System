@@ -126,7 +126,7 @@
                                         <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
 
                                         <div class="col-md-6 d-flex">
-                                            <input min={{ now()->addDay(1) }} id="available_date_1" type="date" class="form-control @error('available_date_1') is-invalid @enderror" name="available_date_1"  autofocus>
+                                            <input min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_1" type="date" class="form-control @error('available_date_1') is-invalid @enderror" name="available_date_1"  autofocus>
 
                                             <select  name="available_time_1" id="available_time_1" class="form-control @error('available_time_1') is-invalid @enderror">
                                                 <option value="08:00 AM">08:00 AM</option>
@@ -165,7 +165,7 @@
                                         <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
 
                                         <div class="col-md-6 d-flex">
-                                            <input  min={{ now()->addDay(1) }} id="available_date_2" type="date" class="form-control @error('available_date_2') is-invalid @enderror" name="available_date_2"   autofocus>
+                                            <input  min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_2" type="date" class="form-control @error('available_date_2') is-invalid @enderror" name="available_date_2"   autofocus>
 
 
                                             <select  name="available_time_2" id="available_time_2" class="form-control @error('available_time_2') is-invalid @enderror">
@@ -205,7 +205,7 @@
                                         <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
 
                                         <div class="col-md-6 d-flex">
-                                            <input  min={{ now()->addDay(1) }} id="available_date_3" type="date" class="form-control @error('available_date_3') is-invalid @enderror" name="available_date_3" autofocus>
+                                            <input  min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_3" type="date" class="form-control @error('available_date_3') is-invalid @enderror" name="available_date_3" autofocus>
 
                                             <select  name="available_time_3" id="available_time_3" class="form-control @error('available_time_3') is-invalid @enderror">
                                                 <option value="08:00 AM">08:00 AM</option>

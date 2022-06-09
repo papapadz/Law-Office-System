@@ -127,7 +127,7 @@ class QueryController extends Controller
             'available_time_3' =>'required'
         ]);
 
-        /**Checks each given available time for duplicates */
+        /** Checks each given available time for duplicates */
         $available_date_array = [request()->available_date_1,request()->available_date_2,request()->available_date_3];
         $available_time_array = [request()->available_time_1,request()->available_time_2,request()->available_time_3];
         

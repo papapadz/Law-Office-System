@@ -104,6 +104,8 @@ class ProfileController extends Controller
 
         /** check if there is a query with the given ID */
         if($queries) {
+            if(Auth::User()->role_id==1 && Auth::User()->id!=$queries->client_id) /** check if query is requeste by the client logged in */
+                    return redirect()->route('user.queries')->with('error','Access Denied');
             $feedback_check = Feedback::where('query_id', $queries->id)->count();
 
             $event_check = CalendarEvent::where('query_id', $queries->id)->with('queries')->first();

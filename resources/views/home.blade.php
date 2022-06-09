@@ -103,7 +103,7 @@
 
 <!-- Modal -->
 @guest
-@elseif(Auth::User()->role_id==3)
+@elseif(Auth::User()->role_id==1)
 <div class="modal fade" id="welcomeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">

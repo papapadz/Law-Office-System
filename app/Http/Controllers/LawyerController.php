@@ -26,8 +26,12 @@ class LawyerController extends Controller
     public function LawyerQuery($id)
     {
         $queries = Query::where('transaction_number', $id)->get();
+        
         /** check if there is a query with the given ID */
-        if($queries) {
+        if(count($queries)>0) {;
+            if(Auth::User()->role_id==2 && Auth::User()->id!=$queries[0]->lawyer_id) /** check if query is assigned to the lawyer logged in */
+                    return redirect()->route('user.queries')->with('error','Access Denied');
+
             $event_check = CalendarEvent::where('query_id', $queries[0]->id)->with('queries')->first();
         
             return view('lawyer.accept', compact('queries', 'event_check'));
