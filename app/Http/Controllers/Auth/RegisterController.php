@@ -62,6 +62,7 @@ class RegisterController extends Controller
             'captcha' => ['required','captcha'], /** captcha */
             'policy' => ['required'] /** require policy input checkbox */
         ],[
+            'captcha.captcha' => 'CAPTCHA validation failed, try again', /** custom error message for captcha */
             'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
         ]);
     }
@@ -128,6 +129,7 @@ class RegisterController extends Controller
        
     }
 
+    /** Captcha Reload */
     public function reloadCaptcha()
     {
         return response()->json(['captcha'=> captcha_img()]);

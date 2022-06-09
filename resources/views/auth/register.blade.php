@@ -219,9 +219,11 @@
                                         <label class="form-check-label" for="policy"> I have read and agree to the
                                          <a href="{{ url('/termsAndCondition') }}" target="_blank"> {{ __('Terms and Agreement') }}</a>
                                      </label>
-                                 </div>
-                             </div>
-                         </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        @include('auth.captcha')
 
 
                          <div class="form-group row">
@@ -411,23 +413,6 @@
                                 <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
                             </div>
                         </div>
-
-                        <div class="form-group row">
-                            <label for="captcha" class="col-md-4 col-form-label text-md-right">Captcha</label>
-                            <div class="col-md-6 captcha">
-                                <span>{!! captcha_img() !!}</span>
-                                <button type="button" class="btn btn-danger" class="reload" id="reload">
-                                &#x21bb;
-                                </button>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for="captcha" class="col-md-4 col-form-label text-md-right">Enter Captcha</label>
-                            <div class="col-md-6">
-                                <input id="captcha" type="text" class="form-control" placeholder="Enter Captcha" name="captcha">
-                            </div>
-                        </div>
-
                         <div class="form-group row">
                             <div class="col-md-6 offset-md-4">
                                 <div class="form-check">
@@ -439,6 +424,9 @@
                                 </div>
                             </div>
                         </div>
+
+                        @include('auth.captcha')
+
                         <div class="form-group row">
                             <div class="col-md-6 offset-md-4 float-right">
                                 <button type="submit" class="btn btn-primary-btn text-white btn">
@@ -456,18 +444,4 @@
         </div>
     </div>
 </div>
-@endsection
-
-@section('scripts')
-<script type="text/javascript">
-    $('#reload').click(function () {
-        $.ajax({
-            type: 'GET',
-            url: 'reload-captcha',
-            success: function (data) {
-                $(".captcha span").html(data.captcha);
-            }
-        });
-    });
-</script>
 @endsection

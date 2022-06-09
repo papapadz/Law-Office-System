@@ -102,11 +102,15 @@ class ProfileController extends Controller
     {
         $queries = Query::where('transaction_number', $id)->first();
 
-        $feedback_check = Feedback::where('query_id', $queries->id)->count();
+        /** check if there is a query with the given ID */
+        if($queries) {
+            $feedback_check = Feedback::where('query_id', $queries->id)->count();
 
-        $event_check = CalendarEvent::where('query_id', $queries->id)->with('queries')->first();
+            $event_check = CalendarEvent::where('query_id', $queries->id)->with('queries')->first();
 
-        return view('profile.transaction', compact('queries' , 'feedback_check', 'event_check'));
+            return view('profile.transaction', compact('queries' , 'feedback_check', 'event_check'));
+        } else // if no query based on the ID, return to previous page
+            return redirect()->back()->with('error','No Record Found');
     }
 
     public function CreateEvent($pstart_date, $pend_date, $resolution_type, $lawyer_email, $client_email)

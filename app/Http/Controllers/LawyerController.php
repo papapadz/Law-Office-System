@@ -26,9 +26,14 @@ class LawyerController extends Controller
     public function LawyerQuery($id)
     {
         $queries = Query::where('transaction_number', $id)->get();
-        $event_check = CalendarEvent::where('query_id', $queries[0]->id)->with('queries')->first();
-
-        return view('lawyer.accept', compact('queries', 'event_check'));
+        /** check if there is a query with the given ID */
+        if($queries) {
+            $event_check = CalendarEvent::where('query_id', $queries[0]->id)->with('queries')->first();
+        
+            return view('lawyer.accept', compact('queries', 'event_check'));
+        } else //if no query, return to previous page
+            return redirect()->back()->with('error','No Record Found');
+        
     }
 
     public function CreateEvent($pstart_date, $pend_date, $resolution_type, $lawyer_email, $client_email)

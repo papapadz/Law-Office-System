@@ -17,10 +17,10 @@
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
+        "mews/captcha": "^3.2",
         "owen-it/laravel-auditing": "^13.0",
         "realrashid/sweet-alert": "^4.0",
-        "spatie/laravel-google-calendar": "^3.4",
-        "buzz/laravel-google-captcha": "2.*"
+        "spatie/laravel-google-calendar": "^3.4"
     },
     "require-dev": {
         "facade/ignition": "^2.3.6",
