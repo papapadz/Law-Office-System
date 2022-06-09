@@ -65,9 +65,12 @@
 
                                 <div class="col-md-6">
                                     <select name="subject" id="subject" class="form-control @error('subject') is-invalid @enderror" name="subject" required>
-                                        <option style="display:none;">Please select</option>
-                                        <option value="General" >I am not sure of the subject</option>
-                                        <option value="Business and Corporate Law" >Business and Corporate Law</option>
+                                        <option disabled selected>Please select</option>
+                                        <option value="1" >I am not sure of the subject</option>
+                                        @foreach($specializations as $specialization)
+                                        <option value="{{ $specialization->id }}" >{{ $specialization->specialization }}</option>
+                                        @endforeach
+                                        {{-- <option value="Business and Corporate Law" >Business and Corporate Law</option>
                                         <option value="Litigation" >Litigation</option>
                                         <option value="Labor Law" >Labor Law</option>
                                         <option value="Intellectual Property" >Intellectual Property</option>
@@ -75,7 +78,7 @@
                                         <option value="Family Law (Marriage, Child, etc.)" >Family Law (Marriage, Child, etc.)</option>
                                         <option value="Property Law">Property Law</option>
                                         <option value="Tax Law" >Tax Law</option>
-                                        <option value="Data Privacy Law" >Data Privacy Law</option>
+                                        <option value="Data Privacy Law" >Data Privacy Law</option> --}}
                                     </select>
                                 </div>
                             </div>

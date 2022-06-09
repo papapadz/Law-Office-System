@@ -77,4 +77,8 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, CanRes
     {
         return $this->hasMany(Query::class, 'lawyer_id');
     }
+
+    public function specializations() {
+        return $this->hasMany(LawyerSpecialization::class,'user_id');
+    }
 }

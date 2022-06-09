@@ -45,42 +45,42 @@ Route::middleware(['verified'])->group(function (){
     // LAWYER ENDPOINTS
 
     // ADMIN ENDPOINTS
+    /** all admin pages will be checked via Admin Middleware, non admins cannot access the following routes */
+    Route::middleware(['admin'])->group(function() {
+        Route::get('/admin/dashboard', 'AdminController@index')->name('admin.dashboard');
 
-    Route::get('/admin/dashboard', 'AdminController@index')->name('admin.dashboard');
+        Route::get('/admin/query/{type}', 'AdminController@AdminQueryType')->name('admin.query');
 
-    Route::get('/admin/query/{type}', 'AdminController@AdminQueryType')->name('admin.query');
+        Route::get('/admin/details/{id}', 'AdminController@QueryDetails')->name('admin.detail');
 
-    Route::get('/admin/details/{id}', 'AdminController@QueryDetails')->name('admin.detail');
+        Route::get('/admin/account/{id}', 'AdminController@AccountList')->name('admin.account');
 
-    Route::get('/admin/account/{id}', 'AdminController@AccountList')->name('admin.account');
+        Route::get('/admin/user/{id}', 'AdminController@AccountDetails')->name('admin.user');
 
-    Route::get('/admin/user/{id}', 'AdminController@AccountDetails')->name('admin.user');
+        Route::post('/admin/approve', 'AdminController@ApproveLawyer')->name('admin.approve');
 
-    Route::post('/admin/approve', 'AdminController@ApproveLawyer')->name('admin.approve');
+        Route::post('/admin/assign', 'AdminController@AssignQuery')->name('admin.assign');
 
-    Route::post('/admin/assign', 'AdminController@AssignQuery')->name('admin.assign');
+        Route::get('/admin/feedbacks', 'AdminController@feedbacks')->name('admin.feedbacks');
 
-    Route::get('/admin/feedbacks', 'AdminController@feedbacks')->name('admin.feedbacks');
+        Route::get('/admin/payments', 'AdminController@payments')->name('admin.payments');
 
-    Route::get('/admin/payments', 'AdminController@payments')->name('admin.payments');
+        Route::get('/admin/inquiries', 'AdminController@Inquiries')->name('admin.inquiries');
 
-    Route::get('/admin/inquiries', 'AdminController@Inquiries')->name('admin.inquiries');
+        Route::post('/admin/inquiries/approve', 'AdminController@ApproveInquiry')->name('inquiries.approve');
 
-    Route::post('/admin/inquiries/approve', 'AdminController@ApproveInquiry')->name('inquiries.approve');
+        Route::get('/admin/inquiries/{id}', 'AdminController@inquirydetails')->name('inquiry.details');
 
-    Route::get('/admin/inquiries/{id}', 'AdminController@inquirydetails')->name('inquiry.details');
+        Route::get('/admin/feedback/{id}', 'AdminController@feedback')->name('admin.feedback');
 
-    Route::get('/admin/feedback/{id}', 'AdminController@feedback')->name('admin.feedback');
+        Route::post('/admin/feedback/approve', 'AdminController@ApproveFeedback')->name('feedback.approve');
 
-    Route::post('/admin/feedback/approve', 'AdminController@ApproveFeedback')->name('feedback.approve');
+        Route::get('/admin/createNewAdmin', 'AdminController@createnewadmin')->name('admin.CreateNewAdmin');
 
-    Route::get('/admin/createNewAdmin', 'AdminController@createnewadmin')->name('admin.CreateNewAdmin');
+        Route::post('/admin/createNewAdmin', 'AdminController@StoreNewAdmin')->name('admin.storeNewAdmin');
 
-    Route::post('/admin/createNewAdmin', 'AdminController@StoreNewAdmin')->name('admin.storeNewAdmin');
-
-    Route::get('/admin/audit', 'AdminController@Audits')->name('admin.audit');
-
-
+        Route::get('/admin/audit', 'AdminController@Audits')->name('admin.audit');
+    });
     // ADMIN ENDPOINTS
 
     Route::get('/online/query', 'QueryController@onlinequery')->name('online.query');

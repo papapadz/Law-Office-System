@@ -11,6 +11,8 @@ use App\User;
 use Carbon;
 use Illuminate\Mail\Mailer;
 use App\Mail\NotifMail;
+use App\Specialization;
+use App\LawyerSpecialization;
 
 class QueryController extends Controller
 {
@@ -22,7 +24,11 @@ class QueryController extends Controller
 
     public function onlinequery()
     {
-        return view('query.online');
+        /** show only available specializations */
+        $availableSpecializations = LawyerSpecialization::select('specialization_id')->groupBy('specialization_id')->get();
+        $specializations = Specialization::where('id','!=',1)->whereIn('id',$availableSpecializations->toArray())->get();
+        
+        return view('query.online', compact('specializations'));
     }
 
     public function offlinequery()

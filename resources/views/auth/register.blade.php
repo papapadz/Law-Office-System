@@ -314,7 +314,11 @@
                             <label for="specialization" class="col-md-4 col-form-label text-md-right">{{ __('Specialization') }}</label>
 
                             <div class="col-md-6">
-                                <input type="checkbox" id="specialization" name="specialization[]" value="General"/>
+                                @foreach($specializations as $specialization)
+                                <input type="checkbox" name="specialization[]" value="{{ $specialization->id }}"/>
+                                <label>{{ $specialization->specialization }}</label><br>
+                                @endforeach
+                                {{-- <input type="checkbox" id="specialization" name="specialization[]" value="General"/>
                                 <label for="General">General</label><br>
                                 <input type="checkbox" id="specialization"name="specialization[]" value="Business and Corporate Law"/>
                                 <label for="Business and Corporate Law">Business and Corporate Law</label><br>
@@ -333,7 +337,7 @@
                                 <input type="checkbox" id="specialization" name="specialization[]" value="Tax Law"/>
                                 <label for="Tax Law">Tax Law</label><br>
                                 <input type="checkbox" id="specialization" name="specialization[]" value="Data Privacy Law"/>
-                                <label for="Data Privacy Law">Data Privacy Law</label><br>
+                                <label for="Data Privacy Law">Data Privacy Law</label><br> --}}
                                 @error('specialization')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -444,4 +448,18 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script type="text/javascript">
+    $('#reload').click(function () {
+        $.ajax({
+            type: 'GET',
+            url: 'reload-captcha',
+            success: function (data) {
+                $(".captcha span").html(data.captcha);
+            }
+        });
+    });
+</script>
 @endsection

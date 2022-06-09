@@ -8,6 +8,8 @@ use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Specialization;
+use App\LawyerSpecialization;
 
 class RegisterController extends Controller
 {
@@ -85,30 +87,47 @@ class RegisterController extends Controller
             $roll_number = null;
         }
 
-        if(isset($data['photo_proof']))
-        {
-            $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
-        }else{
+        // if(isset($data['photo_proof']))
+        // {
+        //     $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
+        // }else{
              $photo_proof = null;
-        }
+        // }
 
         $randon_number = random_int(100000, 999999);
-
+        
         if(request()->role_id == 2){
-            return User::create([
-            'user_number' => $randon_number,
-            'first_name' => ucfirst($data['first_name']),
-            'last_name' => $data['last_name'],
-            'contact_number' => $data['contact_number'],
-            'email' => $data['email'],
-            'role_id' => $data['role_id'],
-            'specialization' => implode(',', (array) $data['specialization']),
-            'availability' =>$data['availability'],
-            'location' =>$data['location'],
-            'password' => Hash::make($data['password']),
-            'roll_number' => $roll_number,
-            'proof_photo_path' => $photo_proof
-        ]);
+            /** Create a User */
+            $user = User::create([
+                'user_number' => $randon_number,
+                'first_name' => ucfirst($data['first_name']),
+                'last_name' => $data['last_name'],
+                'contact_number' => $data['contact_number'],
+                'email' => $data['email'],
+                'role_id' => $data['role_id'],
+                'specialization' => 'x',
+                'availability' =>$data['availability'],
+                'location' =>$data['location'],
+                'password' => Hash::make($data['password']),
+                'roll_number' => $roll_number,
+                'proof_photo_path' => $photo_proof
+            ]);
+            
+            /** Add specializations to the table */
+            $specializationText = '';
+            foreach($data['specialization'] as $specializationId)  {
+                $specializationText .= Specialization::find($specializationId)->specialization.',';
+                LawyerSpecialization::create([
+                    'user_id' => $user->id,
+                    'specialization_id' => $specializationId
+                ]);
+            }
+            
+            User::where('id',$user->id)->update([
+                'specialization' => $specializationText
+            ]);
+            
+            return $user;
         }
         else
         {
@@ -127,6 +146,13 @@ class RegisterController extends Controller
         
 
        
+    }
+
+    /** show registration form */
+    public function showRegistrationForm()
+    {
+        $specializations = Specialization::get();
+        return view('auth.register',compact('specializations'));
     }
 
     /** Captcha Reload */

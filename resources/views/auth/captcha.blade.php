@@ -14,15 +14,3 @@
         <input id="captcha" type="text" class="form-control" placeholder="Enter Captcha" name="captcha">
     </div>
 </div>
-
-<script type="text/javascript">
-    $('#reload').click(function () {
-        $.ajax({
-            type: 'GET',
-            url: 'reload-captcha',
-            success: function (data) {
-                $(".captcha span").html(data.captcha);
-            }
-        });
-    });
-</script>

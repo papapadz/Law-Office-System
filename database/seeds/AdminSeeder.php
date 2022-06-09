@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\User;
+use App\Specialization;
 
 class AdminSeeder extends Seeder
 {
@@ -139,5 +140,20 @@ class AdminSeeder extends Seeder
         ];
 
         User::insert($users);
+
+        /** Specializations */
+        $items = [
+            ['id' => 1, 'specialization' => 'General'],
+            ['id' => 2, 'specialization' => 'Business and Corporate Law'],
+            ['id' => 3, 'specialization' => 'Labor Law'],
+            ['id' => 4, 'specialization' => 'Intellectual Property'],
+            ['id' => 5, 'specialization' => 'Entertainment Law'],
+            ['id' => 6, 'specialization' => 'Family Law (Marriage, Child, etc.)'],
+            ['id' => 7, 'specialization' => 'Property Law'],
+            ['id' => 8, 'specialization' => 'Tax Law'],
+            ['id' => 9, 'specialization' => 'Data Privacy Law'],
+        ];
+
+        Specialization::insert($items);
     }
 }
