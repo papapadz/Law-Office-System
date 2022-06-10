@@ -230,7 +230,7 @@
                                         </div>
                                     </div>
                                 </div>
-
+                                
                                 <div class="form-group row">
                                     <label for="body" class="col-md-4 col-form-label text-md-right">{{ __('Reply from Lawyer (Reminder before going to the office') }}</label>
 
@@ -305,7 +305,7 @@
                                 @endif
 
 
-                                @elseif($query->resolution_type == 'Written Resolution from a Lawyer' && $query->status != 'Complete')
+                                @elseif($query->resolution_type == 'Written Resolution from a Lawyer' && $query->status != 'Complete' && $query->lawyer_id!=null)
 
                                 <div class="form-group row">
                                     <label for="body" class="col-md-4 col-form-label text-md-right">{{ __('Reply from Lawyer') }}</label>
@@ -624,34 +624,35 @@
 
                                     <div class="form-group row">
                                         <div class="mx-auto">
-                                            @if($query->status == 'In-Progress' )
-                                            <button name="action" value="complete" class="btn btn-primary-btn text-white" @if(Carbon\Carbon::parse($event_check->end_time)->gte(Carbon\Carbon::now())) disabled @endif>
-                                                Complete
-                                            </button>
+                                            @if($query->lawyer_id==null)
+                                                <button name="action" value="get" class="btn btn-danger text-white">
+                                                    Accept Query
+                                                </button>
+                                            @elseif($query->status == 'In-Progress' )
+                                                <button name="action" value="complete" class="btn btn-primary-btn text-white" @if(Carbon\Carbon::parse($event_check->end_time)->gte(Carbon\Carbon::now())) disabled @endif>
+                                                    Complete
+                                                </button>
                                             @elseif($query->resolution_type == 'Written Resolution from a Lawyer' && $query->status != 'Complete')
-                                            <button name="action" value="send" class="btn btn-primary-btn text-white">
-                                                Send
-                                            </button>
-                                            <button name="action" value="decline" class="btn btn-danger text-white">
-                                                Decline
-                                            </button>
+                                                <button name="action" value="send" class="btn btn-primary-btn text-white">
+                                                    Send
+                                                </button>
+                                                <button name="action" value="decline" class="btn btn-danger text-white">
+                                                    Decline
+                                                </button>
                                             @elseif($query->category == "Offline Consultation"  &&  $query->status == 'Pending' )
-                                            <button name="action" value="acceptOffline" class="btn btn-primary-btn text-white">
-                                                Accept 
-                                            </button>
-                                            <button name="action" value="declineOffline" class="btn btn-danger text-white">
-                                                Decline 
-                                            </button>
+                                                <button name="action" value="acceptOffline" class="btn btn-primary-btn text-white">
+                                                    Accept 
+                                                </button>
+                                                <button name="action" value="declineOffline" class="btn btn-danger text-white">
+                                                    Decline 
+                                                </button>
                                             @elseif($query->status == 'Pending')
-                                            <button name="action" value="accept" class="btn btn-primary-btn text-white">
-                                                Accept
-                                            </button>
-                                            <button name="action" value="decline" class="btn btn-danger text-white">
-                                                Decline
-                                            </button>
-
-                                            @else
-
+                                                <button name="action" value="accept" class="btn btn-primary-btn text-white">
+                                                    Accept
+                                                </button>
+                                                <button name="action" value="decline" class="btn btn-danger text-white">
+                                                    Decline
+                                                </button>
                                             @endif
 
                                         </div>

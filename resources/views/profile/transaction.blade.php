@@ -54,11 +54,28 @@
                             </div>
                         </div>
 
+                        @if($queries->status == 'Declined')
+                        <div class="form-group-row">
+                            <div class="form-group row">
+                                <label for="subject" class="col-md-4 col-form-label text-md-right">{{ __('Subject of Query') }}</label>
+
+                                <div class="col-md-6">
+                                    <select name="subject" id="subject" class="form-control @error('subject') is-invalid @enderror" name="subject" required>
+                                        <option value="1" selected>I am not sure of the subject</option>
+                                        @foreach($specializations as $specialization)
+                                        <option value="{{ $specialization->id }}" >{{ $specialization->specialization }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="form-group row">
                             <label for="question" class="col-md-4 col-form-label text-md-right">{{ __('Questions / Concerns') }}</label>
 
                             <div class="col-md-6">
-                                <textarea rows="5" style="resize: none;" id="question" type="text" class="form-control @error('question') is-invalid @enderror" name="question" readonly value="{{ old('question') }}" required autocomplete="question">{{ $queries->question }}</textarea>
+                                <textarea rows="5" style="resize: none;" id="question" type="text" class="form-control @error('question') is-invalid @enderror" name="question" @if(!$queries->declined_id) readonly @endif value="{{ old('question') }}" required autocomplete="question">{{ $queries->question }}</textarea>
 
                                 @error('question')
                                 <span class="invalid-feedback" role="alert">
@@ -67,10 +84,136 @@
                                 @enderror
                             </div>
                         </div>
+                        @if($queries->status == 'Declined')
+                        <div class="video type">
+                            <div class="form-group">
+                                <div class="form-group row">
+                                    <label for="schedule" class="col-md-12 col-form-label text-md-center">{{ __('Please provide three another (3) available specific schedules') }}</label>
+                                </div>
 
+                                <div class="form-group row" >
+                                    <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
+
+                                    <div class="col-md-6 d-flex">
+                                        <input min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_1" type="date" class="form-control @error('available_date_1') is-invalid @enderror" name="available_date_1"  autofocus>
+
+                                        <select  name="available_time_1" id="available_time_1" class="form-control @error('available_time_1') is-invalid @enderror">
+                                            <option value="08:00 AM">08:00 AM</option>
+                                            <option value="08:30 AM">08:30 AM</option>
+                                            <option value="09:00 AM">09:00 AM</option>
+                                            <option value="09:30 AM">09:30 AM</option>
+                                            <option value="10:00 AM">10:00 AM</option>
+                                            <option value="10:30 AM">10:30 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="11:30 AM">11:30 AM</option>
+                                            <option value="12:00 PM">12:00 PM</option>
+                                            <option value="12:30 PM">12:30 PM</option>
+                                            <option value="01:00 PM">01:00 PM</option>
+                                            <option value="01:30 PM">01:30 PM</option>
+                                            <option value="02:00 PM">02:00 PM</option>
+                                            <option value="02:30 PM">02:30 PM</option>
+                                            <option value="03:00 PM">03:00 PM</option>
+                                            <option value="03:30 PM">03:30 PM</option>
+                                            <option value="04:00 PM">04:00 PM</option>
+                                            <option value="04:30 PM">04:30 PM</option>
+                                            <option value="05:00 PM">05:00 PM</option>
+                                            <option value="05:30 PM">05:30 PM</option>
+                                            <option value="06:00 PM">06:00 PM</option>
+                                            <option value="06:30 PM">06:30 PM</option>
+                                        </select>
+
+                                        @error('schedule')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
+
+                                    <div class="col-md-6 d-flex">
+                                        <input  min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_2" type="date" class="form-control @error('available_date_2') is-invalid @enderror" name="available_date_2"   autofocus>
+
+
+                                        <select  name="available_time_2" id="available_time_2" class="form-control @error('available_time_2') is-invalid @enderror">
+                                            <option value="08:00 AM">08:00 AM</option>
+                                            <option value="08:30 AM">08:30 AM</option>
+                                            <option value="09:00 AM">09:00 AM</option>
+                                            <option value="09:30 AM">09:30 AM</option>
+                                            <option value="10:00 AM">10:00 AM</option>
+                                            <option value="10:30 AM">10:30 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="11:30 AM">11:30 AM</option>
+                                            <option value="12:00 PM">12:00 PM</option>
+                                            <option value="12:30 PM">12:30 PM</option>
+                                            <option value="01:00 PM">01:00 PM</option>
+                                            <option value="01:30 PM">01:30 PM</option>
+                                            <option value="02:00 PM">02:00 PM</option>
+                                            <option value="02:30 PM">02:30 PM</option>
+                                            <option value="03:00 PM">03:00 PM</option>
+                                            <option value="03:30 PM">03:30 PM</option>
+                                            <option value="04:00 PM">04:00 PM</option>
+                                            <option value="04:30 PM">04:30 PM</option>
+                                            <option value="05:00 PM">05:00 PM</option>
+                                            <option value="05:30 PM">05:30 PM</option>
+                                            <option value="06:00 PM">06:00 PM</option>
+                                            <option value="06:30 PM">06:30 PM</option>
+                                        </select>
+
+                                        @error('schedule')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="schedule" class="col-md-4 col-form-label text-md-right">{{ __('Available Schedule') }}</label>
+
+                                    <div class="col-md-6 d-flex">
+                                        <input  min={{ now()->addDay(1) }} max="{{ now()->addYear()->toDateString() }}" id="available_date_3" type="date" class="form-control @error('available_date_3') is-invalid @enderror" name="available_date_3" autofocus>
+
+                                        <select  name="available_time_3" id="available_time_3" class="form-control @error('available_time_3') is-invalid @enderror">
+                                            <option value="08:00 AM">08:00 AM</option>
+                                            <option value="08:30 AM">08:30 AM</option>
+                                            <option value="09:00 AM">09:00 AM</option>
+                                            <option value="09:30 AM">09:30 AM</option>
+                                            <option value="10:00 AM">10:00 AM</option>
+                                            <option value="10:30 AM">10:30 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="11:30 AM">11:30 AM</option>
+                                            <option value="12:00 PM">12:00 PM</option>
+                                            <option value="12:30 PM">12:30 PM</option>
+                                            <option value="01:00 PM">01:00 PM</option>
+                                            <option value="01:30 PM">01:30 PM</option>
+                                            <option value="02:00 PM">02:00 PM</option>
+                                            <option value="02:30 PM">02:30 PM</option>
+                                            <option value="03:00 PM">03:00 PM</option>
+                                            <option value="03:30 PM">03:30 PM</option>
+                                            <option value="04:00 PM">04:00 PM</option>
+                                            <option value="04:30 PM">04:30 PM</option>
+                                            <option value="05:00 PM">05:00 PM</option>
+                                            <option value="05:30 PM">05:30 PM</option>
+                                            <option value="06:00 PM">06:00 PM</option>
+                                            <option value="06:30 PM">06:30 PM</option>
+                                        </select>
+
+                                        @error('schedule')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         @if($queries->is_payment_verified == '1')
 
-                        @if($queries->category == 'Offline Consultation')
+                        @if($queries->category == 'Offline Consultation' && $queries->lawyer!=null)
                         <div class="form-group row">
                             <label for="lawyer_id" class="col-md-4 col-form-label text-md-right">{{ __('Chosen Lawyer') }}</label>
 
@@ -145,6 +288,8 @@
                                 <center>Your query was declined</center>
                             </div>
                         </div>
+
+                        
                         @endif
 
 
@@ -163,6 +308,7 @@
                             </div>
                         </div>
 
+                        @if($queries->lawyer)
                         <div class="form-group row">
                             <label for="lawyer_id" class="col-md-4 col-form-label text-md-right">{{ __('You are assigned to: ') }}</label>
 
@@ -174,6 +320,7 @@
                                 </select>
                             </div>
                         </div>
+                        @endif
 
                         @if($queries->resolution_type == 'Written Resolution from a Lawyer' && $queries->status == 'Complete')
 
@@ -448,6 +595,16 @@
                 @endif
                 @endif
 
+                @if($queries->status == 'Declined')
+                <div class="form-group row">
+                    <div class="mx-auto">
+                        <button name="action" value="decline-reschedule" class="btn btn-primary-btn bg-primary-color text-white">
+                            Submit Query Again
+                        </button>
+                    </div>
+                </div>
+                @endif
+                
                 @if($queries->status == 'Complete' && $feedback_check == 0 || $queries->status == 'Approved' && $feedback_check == 0 )
                 <div class="form-group row">
                     <label for="feedback" class="col-md-4 col-form-label text-md-right">{{ __('Feedback') }}</label>

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Specialization;
 use App\LawyerSpecialization;
+use App\LawyerTimeFrame;
 
 class RegisterController extends Controller
 {
@@ -62,7 +63,11 @@ class RegisterController extends Controller
             'location' =>['required_if:role_id,2'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'captcha' => ['required','captcha'], /** captcha */
-            'policy' => ['required'] /** require policy input checkbox */
+            'policy' => ['required'], /** require policy input checkbox */
+            
+            /** available lawyer time from and to*/
+            'timeframe_from' => ['required'], 
+            'timeframe_to' => ['required','after:timeframe_from']
         ],[
             'captcha.captcha' => 'CAPTCHA validation failed, try again', /** custom error message for captcha */
             'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
@@ -87,12 +92,12 @@ class RegisterController extends Controller
             $roll_number = null;
         }
 
-        // if(isset($data['photo_proof']))
-        // {
-        //     $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
-        // }else{
+        if(isset($data['photo_proof']))
+        {
+            $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
+        }else{
              $photo_proof = null;
-        // }
+        }
 
         $randon_number = random_int(100000, 999999);
         
@@ -123,10 +128,18 @@ class RegisterController extends Controller
                 ]);
             }
             
+            /** update lawyer specialization */
             User::where('id',$user->id)->update([
                 'specialization' => $specializationText
             ]);
             
+            /** add lawyer time frames */
+            LawyerTimeFrame::create([
+                'lawyer_id' => $user->id,
+                'from' => $data['timeframe_from'],
+                'to' => $data['timeframe_to']
+            ]);
+
             return $user;
         }
         else

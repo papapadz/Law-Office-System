@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\User;
 use App\Specialization;
+use App\LawyerSpecialization;
+use App\LawyerTimeFrame;
 
 class AdminSeeder extends Seeder
 {
@@ -142,18 +144,37 @@ class AdminSeeder extends Seeder
         User::insert($users);
 
         /** Specializations */
-        $items = [
-            ['id' => 1, 'specialization' => 'General'],
-            ['id' => 2, 'specialization' => 'Business and Corporate Law'],
-            ['id' => 3, 'specialization' => 'Labor Law'],
-            ['id' => 4, 'specialization' => 'Intellectual Property'],
-            ['id' => 5, 'specialization' => 'Entertainment Law'],
-            ['id' => 6, 'specialization' => 'Family Law (Marriage, Child, etc.)'],
-            ['id' => 7, 'specialization' => 'Property Law'],
-            ['id' => 8, 'specialization' => 'Tax Law'],
-            ['id' => 9, 'specialization' => 'Data Privacy Law'],
+        $specializationItems = [
+            ['id' => 1, 'specialization' => 'General', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 2, 'specialization' => 'Business and Corporate Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 3, 'specialization' => 'Labor Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 4, 'specialization' => 'Intellectual Property', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 5, 'specialization' => 'Entertainment Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 6, 'specialization' => 'Family Law (Marriage, Child, etc.)', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 7, 'specialization' => 'Property Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 8, 'specialization' => 'Tax Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['id' => 9, 'specialization' => 'Data Privacy Law', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
         ];
+        Specialization::insert($specializationItems);
 
-        Specialization::insert($items);
+        /** Lawyer Specializations */
+        $lawyerSpecializationItems = [
+            ['user_id' => 4, 'specialization_id' => 1, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 5, 'specialization_id' => 2, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 6, 'specialization_id' => 3, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 7, 'specialization_id' => 4, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['user_id' => 8, 'specialization_id' => 5, 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+        ];
+        LawyerSpecialization::insert($lawyerSpecializationItems);
+
+        /** Lawyer Time Frame */
+        $lawyerTimeFrameItems = [
+            ['lawyer_id' => 4, 'from' => '08:00:00', 'to' => '15:00:00', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['lawyer_id' => 5, 'from' => '08:00:00', 'to' => '10:00:00', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['lawyer_id' => 6, 'from' => '09:00:00', 'to' => '12:00:00', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['lawyer_id' => 7, 'from' => '13:00:00', 'to' => '18:00:00', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            ['lawyer_id' => 8, 'from' => '08:00:00', 'to' => '18:00:00', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+        ];
+        LawyerTimeFrame::insert($lawyerTimeFrameItems);
     }
 }

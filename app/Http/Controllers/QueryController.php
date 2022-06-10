@@ -166,37 +166,36 @@ class QueryController extends Controller
         $query->available_time_3 = request()->available_time_3;
         $query->status = 'Pending';
         $query->transaction_number = $randon_number;
-        $choosenlawyer = $this->getLawyer(request()->subject);
-        $query->lawyer_id = $choosenlawyer;      
+        //$choosenlawyer = $this->getLawyer($request);
+        //$query->lawyer_id = $choosenlawyer;      
+        $query->lawyer_id = $this->sendLawyerEmail($request);
         $query->save();
 
+        // $lawyer = User::where('id', $choosenlawyer)->first();
+        // $lawyer->totalAssigned++;
+        // $lawyer->date_of_last_query = Carbon\Carbon::now()->format('Y-m-d H:i');
+        // $lawyer->save();
 
+        //  $details = [
+        //     'title' => 'You Have a New Assigned Query',
+        //     'ReferenceNumber' => $request->transaction_number,
+        //     'body' => 'Please check your OnCon account as we have assigned you a new query.' 
+        //     ];
 
-        $lawyer = User::where('id', $choosenlawyer)->first();
-        $lawyer->totalAssigned++;
-        $lawyer->date_of_last_query = Carbon\Carbon::now()->format('Y-m-d H:i');
-        $lawyer->save();
+        //     $from = env('MAIL_FROM_ADDRESS');
+        //     $name = env('MAIL_FROM_NAME');
+        //     $subject = 'You Have New Assigned Query';
 
-         $details = [
-            'title' => 'You Have a New Assigned Query',
-            'ReferenceNumber' => $request->transaction_number,
-            'body' => 'Please check your OnCon account as we have assigned you a new query.' 
-            ];
+        //     $to = $query->lawyer->email;
 
-            $from = env('MAIL_FROM_ADDRESS');
-            $name = env('MAIL_FROM_NAME');
-            $subject = 'You Have New Assigned Query';
-
-            $to = $query->lawyer->email;
-
-            \Mail::to($to)->send(new NotifMail($details));
+        //     \Mail::to($to)->send(new NotifMail($details));
 
         toast()->success('Success', 'Query successfully sent!')->position('top-end');
         // return redirect()->route('online.query');
         return redirect()->route('user.query', $query->transaction_number);
     }
 
-    public function getLawyer($subject)
+    public function getLawyer(Request $request)
     {
 
         $users = User::where('role_id', 2)->where('is_verified', 1)->where('availability', '!=', 'Offline')->get();
@@ -206,14 +205,17 @@ class QueryController extends Controller
             $availableSubject = $users->pluck('specialization');
             $availSub = explode('-', $availableSubject);
 
-
-            if(strpos($availableSubject, $subject) !== false)
+            if(strpos($availableSubject, $request->subject) !== false)
             {
-
                 $lawyers = User::where('role_id', 2)
-                ->where('specialization', 'LIKE', '%'.$subject.'%' )
-                ->where('availability', '!=', 'Offline')
-                ->get();
+                    ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
+                    ->where([
+                        ['specialization', 'LIKE', '%'.$subject.'%'],['availability', '!=', 'Offline']
+                    ])
+                    ->orWhere([
+                        ['from', '<=', $request->available_time_1], ['from', '<=', $request->available_time_2], ['from', '<=', $request->available_time_3]
+                    ])
+                    ->get();
 
                 foreach($lawyers as $lawyer) 
                 {
@@ -275,5 +277,110 @@ class QueryController extends Controller
                 }
             }
         }
+    }
+
+    /** Query-Lawyer matchmaking algorithm
+     *  this function sends an email to lawyers who are eligible for the submitted query
+    */
+    public function sendLawyerEmail(Request $request) {
+
+        $users = User::where('role_id', 2)->where('is_verified', 1)->where('availability', '!=', 'Offline')->get();
+
+        foreach($users as $user)
+        {
+            $availableSubject = $users->pluck('specialization');
+            $availSub = explode('-', $availableSubject);
+
+            if(strpos($availableSubject, $request->subject) !== false)
+            {
+                $lawyers = User::where('role_id', 2)
+                    ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
+                    ->where([
+                        ['specialization', 'LIKE', '%'.$subject.'%'],['availability', '!=', 'Offline']
+                    ])
+                    ->orWhere([
+                        ['from', '<=', $request->available_time_1], ['from', '<=', $request->available_time_2], ['from', '<=', $request->available_time_3]
+                    ])
+                    ->get();
+                
+                $requestedDates = [$request->available_date_1,$request->available_date_2,$request->available_date_3]; //save requested dates to  an array
+                $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
+                foreach($lawyers as $lawyer) 
+                {
+                    /** get assigned queries to a lawyer */
+                    $queries = Query::where('lawyer_id',$lawyer->id)->get();
+
+                    /** check for conflicts in schedule */
+                    $conflicts = 0; //conflict counter
+                    foreach($queries as $query) {
+
+                        foreach($requestedDates as $k => $requestedDate) {
+
+                            /** check if a query assigned to a lawyer 
+                             *  if requested date is the same, check also if the difference in time is more than 2 hours
+                             */
+                            if($query->assigned_date==$requestedDate) { 
+                                $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
+                                if(Carbon\Carbon::parse($query->schedule_date.' '.$query->schedule_time)->diffInHours($requestedTimeItem)<2)
+                                    $conflicts++;
+                            }
+                        }
+                    }
+
+                    // if conflict > 0 don't send this query to the lawyer
+                    if($conflicts==0) {
+                        $details = [
+                            'title' => 'New Query Match',
+                            'ReferenceNumber' => $request->transaction_number,
+                            'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+                        ];
+    
+                        $from = env('MAIL_FROM_ADDRESS');
+                        $name = env('MAIL_FROM_NAME');
+                        $subject = 'You Have a New Query Match';
+    
+                        $to = $lawyer->email;
+    
+                        \Mail::to($to)->send(new NotifMail($details));
+                    }
+                }
+                return null;
+            }
+            else
+            {
+                
+                $lawyers = User::where('role_id', 2)
+                ->where('specialization', 'LIKE', '%General%' )
+                ->where('availability', '!=', 'Offline')
+                ->get();
+
+                foreach($lawyers as $lawyer) 
+                {
+                    $query_count = $lawyers->pluck('totalAssigned'); 
+
+                    if($query_count === [0]) 
+                    {
+                        $assigned = collect($lawyers)->sortBy('created_at')->first(); 
+                    }
+                    elseif($query_count >= [1] ) 
+                    {
+                        $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
+                    }
+                    else 
+                    {
+
+                        $filtered = $lawyers->filter(function($value, $key) 
+                        {
+                            return $value['date_of_last_query'] == NULL; 
+                        });
+
+                        $assigned = collect($filtered)->sortBy('created_at')->first(); 
+                    }
+
+                    return $assigned->id; 
+                }
+            }
+        }
+        return null;
     }
 }

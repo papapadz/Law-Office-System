@@ -18,6 +18,8 @@ use Google_Service_Calendar_Event;
 use App\CalendarEvent;
 use App\Payment;
 use App\Rules\MatchOldPassword;
+use App\Specialization;
+use App\LawyerSpecialization;
 
 class ProfileController extends Controller
 {
@@ -86,8 +88,8 @@ class ProfileController extends Controller
 
         }else if($role_id == 2)
         {
-            $queries = Query::where('lawyer_id', $user_id)->get();
-            $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->get();
+            $queries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
+            $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
             // $queries = Query::where('lawyer_id', $user_id)->get();
         }else{
             $queries = Query::with('lawyer')->get();
@@ -110,7 +112,11 @@ class ProfileController extends Controller
 
             $event_check = CalendarEvent::where('query_id', $queries->id)->with('queries')->first();
 
-            return view('profile.transaction', compact('queries' , 'feedback_check', 'event_check'));
+            /** show only available specializations */
+            $availableSpecializations = LawyerSpecialization::select('specialization_id')->groupBy('specialization_id')->get();
+            $specializations = Specialization::where('id','!=',1)->whereIn('id',$availableSpecializations->toArray())->get();
+            
+            return view('profile.transaction', compact('queries' , 'feedback_check', 'event_check','specializations'));
         } else // if no query based on the ID, return to previous page
             return redirect()->back()->with('error','No Record Found');
     }
@@ -294,6 +300,60 @@ class ProfileController extends Controller
 
             toast()->success('Success', 'Feedback successfully sent!')->position('top-end');
 
+            return redirect()->route('user.queries');
+        }elseif($request->input('action') == 'decline-reschedule')
+        {
+            $request->validate([
+                'available_date_1' => 'required',
+                'available_date_2' => 'required',
+                'available_date_3' => 'required',
+                'subject' => 'required',
+                'question' => 'required',
+            ]);
+
+            /** Checks each given available time for duplicates */
+            $available_date_array = [request()->new_available_date_1,request()->new_available_date_2,request()->new_available_date_3];
+            $available_time_array = [request()->new_available_time_1,request()->new_available_time_2,request()->new_available_time_3];
+        
+            foreach($available_date_array as $i => $row) {
+                for($j=1;$j<=3;$j++) {
+                    $counter = Query::where([
+                        ['client_id',Auth()->user()->id],
+                        ['available_date_'.$j,$row],
+                        ['available_time_'.$j,$available_time_array[$i]],
+                        ['transaction_number','!=',$request->transaction_number]
+                    ])
+                    ->count();
+
+                    if($counter>0)
+                        return back()->withErrors(
+                            ['schedule' => 'Duplicate appointment on '.$row.' '.$available_time_array[$i]]);
+                }
+            }
+            /** end checking */
+            
+            /** Update query */
+            $newQuery = Query::where('transaction_number', $request->transaction_number)->first();
+            $newQuery->question = $request->question;
+            $newQuery->subject = Specialization::find($request->subject)->specialization;
+            $newQuery->status = 'Pending';
+            $newQuery->available_date_1 = $request->available_date_1;
+            $newQuery->available_date_2 = $request->available_date_2;
+            $newQuery->available_date_3 = $request->available_date_3;
+            $newQuery->available_time_1 = $request->available_time_1;
+            $newQuery->available_date_2 = $request->available_date_2;
+            $newQuery->available_date_3 = $request->available_date_3;
+            
+            /** Call Query-Lawyer Matchmaking Algo */
+            $queryController = new QueryController;
+            //send email to lawyers
+            $newQuery->lawyer_id = $queryController->sendLawyerEmail($request);
+            //save new updated query info
+            $newQuery->save();
+
+            toast()->success('Success', 'New Query has been sent!')->position('top-end');
+
+            //return to queries page
             return redirect()->route('user.queries');
         }
     }

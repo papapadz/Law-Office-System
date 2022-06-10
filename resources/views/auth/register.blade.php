@@ -367,6 +367,63 @@
                                 @enderror
                             </div>
                         </div>
+                        
+                        <div class="form-group row">
+
+                            <label for="timeframe_from" class="col-md-4 col-form-label text-md-right">{{ __('Preferred Time') }}</label>
+
+                            <div class="col-md-3">
+                                    <select  name="timeframe_from" id="timeframe_from" class="form-control @error('timeframe_from') is-invalid @enderror">
+                                        <option value="08:00 AM">08:00 AM</option>
+                                        <option value="08:30 AM">08:30 AM</option>
+                                        <option value="09:00 AM">09:00 AM</option>
+                                        <option value="09:30 AM">09:30 AM</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="10:30 AM">10:30 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="11:30 AM">11:30 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="12:30 PM">12:30 PM</option>
+                                        <option value="01:00 PM">01:00 PM</option>
+                                        <option value="01:30 PM">01:30 PM</option>
+                                        <option value="02:00 PM">02:00 PM</option>
+                                        <option value="02:30 PM">02:30 PM</option>
+                                        <option value="03:00 PM">03:00 PM</option>
+                                        <option value="03:30 PM">03:30 PM</option>
+                                        <option value="04:00 PM">04:00 PM</option>
+                                        <option value="04:30 PM">04:30 PM</option>
+                                        <option value="05:00 PM">05:00 PM</option>
+                                        <option value="05:30 PM">05:30 PM</option>
+                                        <option value="06:00 PM">06:00 PM</option>
+                                        <option value="06:30 PM">06:30 PM</option>
+                                    </select>
+                            </div>
+                            to
+                            <div class="col-md-3">
+                                    <select  name="timeframe_to" id="timeframe_to" class="form-control @error('timeframe_to') is-invalid @enderror">
+                                        <option selected value="09:00 AM">09:00 AM</option>
+                                        <option value="09:30 AM">09:30 AM</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="10:30 AM">10:30 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="11:30 AM">11:30 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="12:30 PM">12:30 PM</option>
+                                        <option value="01:00 PM">01:00 PM</option>
+                                        <option value="01:30 PM">01:30 PM</option>
+                                        <option value="02:00 PM">02:00 PM</option>
+                                        <option value="02:30 PM">02:30 PM</option>
+                                        <option value="03:00 PM">03:00 PM</option>
+                                        <option value="03:30 PM">03:30 PM</option>
+                                        <option value="04:00 PM">04:00 PM</option>
+                                        <option value="04:30 PM">04:30 PM</option>
+                                        <option value="05:00 PM">05:00 PM</option>
+                                        <option value="05:30 PM">05:30 PM</option>
+                                        <option value="06:00 PM">06:00 PM</option>
+                                        <option value="06:30 PM">06:30 PM</option>
+                                    </select>
+                            </div>
+                        </div>
 
                         <div class="form-group row">
                             <label for="location" class="col-md-4 col-form-label text-md-right">{{ __('Location') }}</label>

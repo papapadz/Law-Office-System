@@ -29,15 +29,17 @@ class LawyerController extends Controller
         
         /** check if there is a query with the given ID */
         if(count($queries)>0) {;
-            if(Auth::User()->role_id==2 && Auth::User()->id!=$queries[0]->lawyer_id) /** check if query is assigned to the lawyer logged in */
-                    return redirect()->route('user.queries')->with('error','Access Denied');
-
+            if(Auth::User()->role_id==2 && Auth::User()->id!=$queries[0]->lawyer_id && $queries[0]->lawyer_id!=null) {/** check if query is assigned to the lawyer logged in or no lawyer is assigned to it */
+                toast()->success('Error', 'Access Denied')->position('top-end');
+                return redirect()->route('user.queries');
+            }
             $event_check = CalendarEvent::where('query_id', $queries[0]->id)->with('queries')->first();
         
             return view('lawyer.accept', compact('queries', 'event_check'));
-        } else //if no query, return to previous page
-            return redirect()->back()->with('error','No Record Found');
-        
+        } else {//if no query, return to previous page
+            toast()->success('Error', 'No Record Found')->position('top-end');
+            return redirect()->back();
+        }
     }
 
     public function CreateEvent($pstart_date, $pend_date, $resolution_type, $lawyer_email, $client_email)
@@ -139,8 +141,8 @@ class LawyerController extends Controller
 
     public function AcceptOnlineQuery(Request $request)
     {
-        $queries = Query::where('transaction_number', $request->transaction_number)->with('lawyer', 'client')->first();
-
+        $queries = Query::where('transaction_number', $request->transaction_number)->with('client')->first();
+        
         if($request->input('action') == 'accept')
         {
 
@@ -154,15 +156,27 @@ class LawyerController extends Controller
             // ]);
 
             $start_date = Carbon\Carbon::parse($schedule_date ."". $schedule_time)->format('Y-m-d H:i+08:00');
-
             $end_date = Carbon\Carbon::parse($schedule_date ."". $schedule_time)->addHour(2)->format('Y-m-d H:i+08:00');
-
             $pstart_date = Carbon\Carbon::parse($start_date);
             $pend_date = Carbon\Carbon::parse($end_date);
             $resolution_type = $queries->resolution_type;
-            $lawyer_email = $queries->lawyer->email;
+            $lawyer_email = Auth::User()->email;
             $client_email = $queries->client->email;
 
+            /** get assigned queries to the logged in lawyer */
+            $scheduledQueries = Query::where('lawyer_id',Auth::User()->id)->get();
+
+            /** check for conflicts in schedule */
+            foreach($scheduledQueries as $scheduledQuery) {
+
+                /** check if requested date is the same, check also if the difference in time is more than 2 hours */
+                if($scheduledQuery->schedule_date==$schedule_date) { 
+                    if(Carbon\Carbon::parse($scheduledQuery->schedule_date.' '.$scheduledQuery->schedule_time)->diffInHours($start_date)<2) {
+                        toast()->success('Error', 'A conflict in schedule for '.Carbon\Carbon::parse($start_date)->toDateTimeString().'. Choose another date!')->position('top-end');
+                        return redirect()->back();
+                    }
+                }
+            }
             $event = $this->CreateEvent($pstart_date, $pend_date, $resolution_type, $lawyer_email, $client_email);
 
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
@@ -309,18 +323,17 @@ class LawyerController extends Controller
                     'transactionNumber' => $request->transaction_number,
                     'body' => $request->body,
                     'attach_file' => $attached_file  
-            ];               
-            \Mail::to($to)->send(new FeedbackMail($details));
-        }
+                ];               
+                \Mail::to($to)->send(new FeedbackMail($details));
+            }
 
-        toast()->success('Success', 'Message sent successfully')->position('top-end');
-    }
+            toast()->success('Success', 'Message sent successfully')->position('top-end');
+        }
         elseif($request->input('action') == 'acceptOffline')
         {
             $schedule = explode('--', $request->schedule);
             $schedule_date = $schedule[0];
             $schedule_time = $schedule[1];
-
 
             $request->validate([
                 'reply_offline' => 'required|string'
@@ -377,7 +390,22 @@ class LawyerController extends Controller
 
             toast()->success('Success', 'Query accepted successfully')->position('top-end');
         }
-    return redirect()->route('user.queries');
+        elseif($request->input('action') == 'get')
+        {
+            $queries = Query::where('transaction_number', $request->transaction_number)->first();
+
+            if($queries->lawyer_id!=null) {
+            /** check if the query is not yet assigned to other lawyers */
+                $queries->lawyer_id = Auth::User()->id;
+                $queries->save();
+                
+                toast()->success('Success', 'Query accepted successfully')->position('top-end');
+                
+                return redirect()->back();
+            } else
+                toast()->success('Sorry', 'Query has already been assigned to another Lawyer')->position('top-end');
+        }
+        return redirect()->route('user.queries');
 
     }
 
