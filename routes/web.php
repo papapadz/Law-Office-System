@@ -140,3 +140,6 @@ Route::get('/create-event', 'TokenController@CreateEvent')->name('create.event')
 
 /** Route for new captcha */
 Route::get('/reload-captcha', [App\Http\Controllers\Auth\RegisterController::class, 'reloadCaptcha']);
+
+/** call this for checking of unassigned queries */
+Route::get('/query/check-unassigned', 'QueryController@checkUnassigned');

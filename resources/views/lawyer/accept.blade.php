@@ -626,7 +626,7 @@
                                         <div class="mx-auto">
                                             @if($query->lawyer_id==null)
                                                 <button name="action" value="get" class="btn btn-danger text-white">
-                                                    Accept Query
+                                                    Get this Query
                                                 </button>
                                             @elseif($query->status == 'In-Progress' )
                                                 <button name="action" value="complete" class="btn btn-primary-btn text-white" @if(Carbon\Carbon::parse($event_check->end_time)->gte(Carbon\Carbon::now())) disabled @endif>

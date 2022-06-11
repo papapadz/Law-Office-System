@@ -6,7 +6,18 @@
         <div class="col-md-10">
          <div class="card mt-3 mx-auto">
             <div class="card-header text-center bg-primary-color text-white">
-                <a class="text-white" href="{{ route('user.queries') }}">My Transactions</a>
+                <a class="text-white" href="{{ route('user.queries') }}">My Transactions ( Step
+                    @if( $queries->status=='Complete')
+                        6
+                    @elseif($queries->is_payment_verified && $queries->status=='In-Progress')
+                        5
+                    @elseif($queries->proof_photo_url && $queries->status=='Pending')
+                        4
+                    @elseif(!$queries->is_payment_verified)
+                        3
+                    @endif
+                    )
+                </a>
             </div>
             <div class="card-body">
                 <form action="{{ route('user.accept') }}" method="POST">
@@ -654,8 +665,10 @@
         <div class="container mx-auto">
             <h5 class="text-center">Your Meeting starts at {{ $event_check->start_time }} and ends at {{ $event_check->end_time }}. 
                 <br>
-                Your meeting link -- <strong>
-                <a target="_blank" href="{{ $event_check->meeting_link }}">{{ $event_check->meeting_link }}</a></strong>
+                
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#googleMeetModal">
+                    Show Meeting Link
+                </button>
             </h5>
         </div>
     </div>
@@ -663,4 +676,33 @@
 
 </div> 
 </div>
+
+<!-- Modal -->
+@if(($event_check && $queries->status == 'In-Progress' && $queries->is_payment_verified == 1) )
+<div class="modal fade" id="googleMeetModal" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="staticBackdropLabel">Reminder</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse fermentum mattis finibus. Praesent tincidunt aliquet metus, id egestas leo suscipit in. Nulla aliquam, nulla nec venenatis accumsan, est felis scelerisque justo, vel efficitur nisi elit eget nibh. Maecenas dapibus massa felis, non venenatis neque euismod ut. Etiam varius enim nisl, et iaculis libero rhoncus sit amet. Vestibulum non sagittis mi. Suspendisse euismod quis ante ut laoreet. Praesent ut mollis nulla.
+
+            Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Sed at ullamcorper erat. Nam tincidunt enim erat, nec fermentum sem volutpat gravida. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla facilisi. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse sed felis egestas, sagittis magna a, luctus libero. Sed nec tellus imperdiet, dignissim purus vitae, facilisis ligula. Nam vitae condimentum felis, eu fringilla metus. Sed aliquet nisl vitae magna auctor, vitae placerat dui vulputate. Quisque vel feugiat mi, in fermentum orci. Pellentesque a mi dui. Quisque tempor dui nec lorem venenatis, quis lacinia augue luctus. Praesent malesuada suscipit velit, dictum sodales libero efficitur non. Maecenas congue pretium tellus.
+            
+            In aliquam laoreet ex, vitae sagittis metus aliquam quis. Sed a vehicula nisl, vitae lobortis quam. Fusce augue metus, commodo id placerat sit amet, ullamcorper a purus. Donec ultricies dignissim ornare. Integer sed erat sit amet sem efficitur commodo. Praesent vehicula interdum metus, vel interdum odio elementum a. Ut libero lorem, porta vel eleifend nec, pretium bibendum nisi. Pellentesque et auctor magna, fermentum lacinia est. Etiam ligula urna, sollicitudin id sodales ut, tempus nec mi. Sed sit amet sem id justo mattis rutrum. Cras erat libero, vehicula vitae ipsum sed, maximus bibendum quam.
+            
+            Vestibulum in euismod libero. Etiam ultricies arcu nibh, vitae dapibus quam sollicitudin in. Ut blandit ipsum nec lorem porta luctus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nec tempor eros. Duis a dignissim turpis, eget lobortis lorem. Vestibulum vehicula, massa id imperdiet convallis, urna est lacinia risus, lacinia porttitor enim ipsum in libero. Sed pulvinar id mauris facilisis lobortis. Suspendisse ac vulputate nisi. Sed vitae arcu turpis. Cras auctor ante sit amet purus commodo fringilla. Etiam vel massa nisi. Donec molestie et metus quis efficitur. Integer mauris quam, feugiat venenatis ex at, imperdiet commodo dui.
+          </p>
+          <a class="btn btn-primary" target="_blank" href="{{ $event_check->meeting_link }}">{{ $event_check->meeting_link }}</a></strong>
+        </div>
+      </div>
+    </div>
+  </div>
+@endif
+
 @endsection

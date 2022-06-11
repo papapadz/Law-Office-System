@@ -68,7 +68,7 @@
                                         <option disabled selected>Please select</option>
                                         <option value="1" >I am not sure of the subject</option>
                                         @foreach($specializations as $specialization)
-                                        <option value="{{ $specialization->id }}" >{{ $specialization->specialization }}</option>
+                                        <option value="{{ $specialization->specialization }}" >{{ $specialization->specialization }}</option>
                                         @endforeach
                                         {{-- <option value="Business and Corporate Law" >Business and Corporate Law</option>
                                         <option value="Litigation" >Litigation</option>

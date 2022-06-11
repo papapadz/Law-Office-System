@@ -41,6 +41,7 @@
 						Proof of Payment
 					</div>
 					<div class="card-body">
+						
 						<form method="POST" action="{{ route('payment.upload') }}" enctype="multipart/form-data">
 							@csrf
 						<div class="form-group row">
@@ -70,7 +71,7 @@
 								@enderror
 							</div>
 						</div>
-
+						
 						<div class="form-group row mt-3">
 							<button class="btn btn-primary-btn text-white mx-auto">
 								Submit

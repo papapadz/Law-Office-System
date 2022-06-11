@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Specialization;
 use App\LawyerSpecialization;
 use App\LawyerTimeFrame;
+use Carbon;
 
 class RegisterController extends Controller
 {
@@ -136,8 +137,8 @@ class RegisterController extends Controller
             /** add lawyer time frames */
             LawyerTimeFrame::create([
                 'lawyer_id' => $user->id,
-                'from' => $data['timeframe_from'],
-                'to' => $data['timeframe_to']
+                'from' => Carbon\Carbon::parse($data['timeframe_from'])->toTimeString(),
+                'to' => Carbon\Carbon::parse($data['timeframe_to'])->toTimeString()
             ]);
 
             return $user;

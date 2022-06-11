@@ -393,8 +393,8 @@ class LawyerController extends Controller
         elseif($request->input('action') == 'get')
         {
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
-
-            if($queries->lawyer_id!=null) {
+            
+            if($queries->lawyer_id==null) {
             /** check if the query is not yet assigned to other lawyers */
                 $queries->lawyer_id = Auth::User()->id;
                 $queries->save();
