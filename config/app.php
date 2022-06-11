@@ -52,9 +52,7 @@ return [
     |
     */
 
-    //'url' => env('APP_URL', 'https://isproj2b.benilde.edu.ph/OnCon'),
-
-    'url' => env('APP_URL','http://localhost:8000'),
+    'url' => env('APP_URL', 'https://isproj2b.benilde.edu.ph/OnCon'),
 
     'asset_url' => env('ASSET_URL', null),
 

@@ -394,8 +394,8 @@ class ProfileController extends Controller
 
         $queries = Query::where('transaction_number', $transaction_number)->first();
 
-        //$proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
-        $proof_photo = 'aasdasmdl;asdl;askd';
+        $proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
+        
         $queries->proof_photo_url = $proof_photo;
         $queries->save();
 
