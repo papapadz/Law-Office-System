@@ -659,7 +659,7 @@
             </div>
         </form>
     </div>
-
+    
     @if(($event_check && $queries->status == 'In-Progress' && $queries->is_payment_verified == 1) )
     <div class="card-body">
         <div class="container mx-auto">

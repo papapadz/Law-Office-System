@@ -389,7 +389,9 @@ class ProfileController extends Controller
 
     public function UploadPayment(Request $request)
     {
-
+        $request->validate([
+            'proof_photo' => 'required|mimes:pdf,docx,jpg,bmp,png' /** restrict file uploads to PDF, Word document and Images */
+        ]);
         $transaction_number = $request->transaction_number;
 
         $queries = Query::where('transaction_number', $transaction_number)->first();

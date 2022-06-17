@@ -296,7 +296,7 @@ class QueryController extends Controller
                 $lawyers = User::where('role_id', 2)
                     ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
                     ->where([
-                        ['specialization', 'LIKE', '%'.$subject.'%'],['availability', '!=', 'Offline']
+                        ['specialization', 'LIKE', '%'.$request->subject.'%'],['availability', '!=', 'Offline']
                     ])
                     ->orWhere([
                         ['from', '<=', $request->available_time_1], ['from', '<=', $request->available_time_2], ['from', '<=', $request->available_time_3]
@@ -307,7 +307,6 @@ class QueryController extends Controller
                 $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
                 
                 if($lawyers) {
-                    
                     $lawyersAvailableCount = 0;
                     foreach($lawyers as $lawyer) 
                     {

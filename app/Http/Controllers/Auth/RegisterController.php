@@ -53,26 +53,49 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'contact_number' => ['required', 'numeric', 'digits:11'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'role_id' => ['required', 'exists:roles,id'],
-            'specialization' =>['required_if:role_id,2'],
-            'availability' =>['required_if:role_id,2'],
-            'location' =>['required_if:role_id,2'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'captcha' => ['required','captcha'], /** captcha */
-            'policy' => ['required'], /** require policy input checkbox */
-            
-            /** available lawyer time from and to*/
-            'timeframe_from' => ['required'], 
-            'timeframe_to' => ['required','after:timeframe_from']
-        ],[
-            'captcha.captcha' => 'CAPTCHA validation failed, try again', /** custom error message for captcha */
-            'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
-        ]);
+        if($data['role_id']==2) {
+            return Validator::make($data, [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'contact_number' => ['required', 'numeric', 'digits:11'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'role_id' => ['required', 'exists:roles,id'],
+                'specialization' =>['required_if:role_id,2'],
+                'availability' =>['required_if:role_id,2'],
+                'location' =>['required_if:role_id,2'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'captcha' => ['required','captcha'], /** captcha */
+                'policy' => ['required'], /** require policy input checkbox */
+                
+                /** available lawyer time from and to*/
+                'timeframe_from' => ['required'], 
+                'timeframe_to' => ['required','after:timeframe_from']
+            ],[
+                'captcha.captcha' => 'CAPTCHA validation failed, try again', /** custom error message for captcha */
+                'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
+            ]);
+        } else {
+            return Validator::make($data, [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'contact_number' => ['required', 'numeric', 'digits:11'],
+                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'role_id' => ['required', 'exists:roles,id'],
+                //'specialization' =>['required_if:role_id,2'],
+                //'availability' =>['required_if:role_id,2'],
+                'location' =>['required_if:role_id,2'],
+                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'captcha' => ['required','captcha'], /** captcha */
+                'policy' => ['required'], /** require policy input checkbox */
+                
+                /** available lawyer time from and to*/
+                //'timeframe_from' => ['required'], 
+                //'timeframe_to' => ['required','after:timeframe_from']
+            ],[
+                'captcha.captcha' => 'CAPTCHA validation failed, try again', /** custom error message for captcha */
+                'policy.required' => 'Please read and accept our Terms and Conditions' /** custom error message for policy input checkbox */
+            ]);
+        }
     }
 
     /**
@@ -83,7 +106,10 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-
+        Validator::make($data,[
+            'proof_photo' => 'required|mimes:pdf,docx,jpg,bmp,png'
+        ]);
+        
         if(request()->roll_number != '')
         {
 
@@ -95,7 +121,8 @@ class RegisterController extends Controller
 
         if(isset($data['photo_proof']))
         {
-            $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
+            $photo_proof = null;
+            //$photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
         }else{
              $photo_proof = null;
         }
