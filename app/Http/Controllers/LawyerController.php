@@ -215,30 +215,29 @@ class LawyerController extends Controller
 
             toast()->success('Success', 'Query accepted successfully')->position('top-end');
 
-
-        }elseif($request->input('action') == 'decline')
+        } elseif($request->input('action') == 'decline')
         {
 
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
-            $declineIDs['declined_id'] = $queries->lawyer->id;
+            $declineIDs['declined_id'] = Auth::User()->id;
             $queries->declined_id = $declineIDs;
-            $queries->lawyer_id = $this->getLawyer(request()->subject);
+            //$queries->lawyer_id = $this->getLawyer(request()->subject);
             $queries->status = 'Pending';
             $queries->save();
 
-            $details = [
-                'title' => 'You Have a New Assigned Query',
-                'ReferenceNumber' => $request->transaction_number,
-                'body' => 'Please check your OnCon account as we have assigned you a new query.' 
-            ];
+            // $details = [
+            //     'title' => 'You Have a New Assigned Query',
+            //     'ReferenceNumber' => $request->transaction_number,
+            //     'body' => 'Please check your OnCon account as we have assigned you a new query.' 
+            // ];
 
-            $from = env('MAIL_FROM_ADDRESS');
-            $name = env('MAIL_FROM_NAME');
-            $subject = 'You Have New Assigned Query';
+            // $from = env('MAIL_FROM_ADDRESS');
+            // $name = env('MAIL_FROM_NAME');
+            // $subject = 'You Have New Assigned Query';
 
-            $to = $queries->lawyer->email;
+            // $to = $queries->lawyer->email;
 
-            \Mail::to($to)->send(new NotifMail($details));
+            // \Mail::to($to)->send(new NotifMail($details));
 
             toast()->success('Success', 'Query declined successfully')->position('top-end');
 
@@ -331,41 +330,51 @@ class LawyerController extends Controller
         }
         elseif($request->input('action') == 'acceptOffline')
         {
-            $schedule = explode('--', $request->schedule);
-            $schedule_date = $schedule[0];
-            $schedule_time = $schedule[1];
-
-            $request->validate([
-                'reply_offline' => 'required|string'
-            ]);
-
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
-            $queries->status ='Approved';
-            $queries->schedule_date = $schedule_date;
-            $queries->schedule_time = $schedule_time;
-            $queries->reply_offline = request()->reply_offline;
-            $queries->save();
-            
 
-            $scheduled_date = Carbon\Carbon::parse($queries->schedule_date)->isoFormat('MMM Do YYYY');
+            if($queries->resolution_type=='Written Resolution from a Lawyer') {
+                $queries->lawyer_id = Auth::User()->id;
+                $queries->save();
+                toast()->success('Success', 'Query accepted successfully')->position('top-end');
+                return redirect()->back();
+            } else {
 
-            $details = [
-                'title' => $queries->category . ' Notification',
-                'body' => 'Your reservation for Atty. '.$queries->lawyer->last_name.' was accepted. Please be reminded that your schedule is at ' .$scheduled_date. ' -- '.$schedule_time. ' This is regarding your sent query: '. $queries->question,
-                'ReferenceNumber' => $queries->transaction_number
-
-            ];
-
-            $from = env('MAIL_FROM_ADDRESS');
-            $name = env('MAIL_FROM_NAME');
-            $to = $queries->email;
-            $toname = $queries->email;
-
-
-            \Mail::to($to)->send(new NotifMail($details));
-
-
-            toast()->success('Success', 'Query accepted successfully')->position('top-end');
+                $schedule = explode('--', $request->schedule);
+                $schedule_date = $schedule[0];
+                $schedule_time = $schedule[1];
+    
+                $request->validate([
+                    'reply_offline' => 'required|string'
+                ]);
+    
+                //$queries = Query::where('transaction_number', $request->transaction_number)->first();
+                $queries->status ='Approved';
+                $queries->schedule_date = $schedule_date;
+                $queries->schedule_time = $schedule_time;
+                $queries->reply_offline = request()->reply_offline;
+                $queries->save();
+                
+    
+                $scheduled_date = Carbon\Carbon::parse($queries->schedule_date)->isoFormat('MMM Do YYYY');
+    
+                $details = [
+                    'title' => $queries->category . ' Notification',
+                    'body' => 'Your reservation for Atty. '.$queries->lawyer->last_name.' was accepted. Please be reminded that your schedule is at ' .$scheduled_date. ' -- '.$schedule_time. ' This is regarding your sent query: '. $queries->question,
+                    'ReferenceNumber' => $queries->transaction_number
+    
+                ];
+    
+                $from = env('MAIL_FROM_ADDRESS');
+                $name = env('MAIL_FROM_NAME');
+                $to = $queries->email;
+                $toname = $queries->email;
+    
+    
+                \Mail::to($to)->send(new NotifMail($details));
+    
+    
+                toast()->success('Success', 'Query accepted successfully')->position('top-end');
+            }
         }
         elseif($request->input('action') == 'declineOffline')
         {
@@ -390,21 +399,21 @@ class LawyerController extends Controller
 
             toast()->success('Success', 'Query accepted successfully')->position('top-end');
         }
-        elseif($request->input('action') == 'get')
-        {
-            $queries = Query::where('transaction_number', $request->transaction_number)->first();
+        // elseif($request->input('action') == 'get')
+        // {
+        //     $queries = Query::where('transaction_number', $request->transaction_number)->first();
             
-            if($queries->lawyer_id==null) {
-            /** check if the query is not yet assigned to other lawyers */
-                $queries->lawyer_id = Auth::User()->id;
-                $queries->save();
+        //     if($queries->lawyer_id==null) {
+        //     /** check if the query is not yet assigned to other lawyers */
+        //         $queries->lawyer_id = Auth::User()->id;
+        //         $queries->save();
                 
-                toast()->success('Success', 'Query accepted successfully')->position('top-end');
+        //         toast()->success('Success', 'Query accepted successfully')->position('top-end');
                 
-                return redirect()->back();
-            } else
-                toast()->success('Sorry', 'Query has already been assigned to another Lawyer')->position('top-end');
-        }
+        //         return redirect()->back();
+        //     } else
+        //         toast()->success('Sorry', 'Query has already been assigned to another Lawyer')->position('top-end');
+        // }
         return redirect()->route('user.queries');
 
     }

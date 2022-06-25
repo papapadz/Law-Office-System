@@ -16,7 +16,7 @@
             <div class="card mt-3">
                 <div class="card-body">
                     <div class="container">
-                        <form method="POST" action={{ route('online.query') }}>
+                        <form method="POST" action={{ route('store.online.query') }}>
                             @csrf
                             <div class="form-group row">
                                 <label for="name" class="col-md-4 col-form-label text-md-right">{{ __('Name') }}</label>
@@ -68,7 +68,7 @@
                                         <option disabled selected>Please select</option>
                                         <option value="1" >I am not sure of the subject</option>
                                         @foreach($specializations as $specialization)
-                                        <option value="{{ $specialization->specialization }}" >{{ $specialization->specialization }}</option>
+                                        <option value="{{ $specialization->id }}" >{{ $specialization->specialization }}</option>
                                         @endforeach
                                         {{-- <option value="Business and Corporate Law" >Business and Corporate Law</option>
                                         <option value="Litigation" >Litigation</option>
@@ -101,7 +101,7 @@
                                 <label for="resolution_type" class="col-md-4 col-form-label text-md-right">{{ __('Choose Resolution') }}</label>
 
                                 <div class="col-md-6">
-                                    <input type="radio" name="resolution_type" id="written" value="Written Resolution from a Lawyer" checked="" />
+                                    <input type="radio" name="resolution_type" id="written" value="Written Resolution from a Lawyer" checked />
                                     <label for="written">Written Resolution</label>
                                     <br>
                                     <input type="radio" name="resolution_type" id="video" value="Video Conference with a Lawyer"/>
@@ -116,7 +116,7 @@
                                 </div>                                  
                             </div>
 
-                            <div class="video type">
+                            <div class="video type" style="display: none">
                                 <div class="form-group">
                                     <div class="form-group row">
                                         <label for="schedule" class="col-md-12 col-form-label text-md-center">{{ __('Please provide three (3) available specific schedules') }}</label>

@@ -624,29 +624,40 @@
 
                                     <div class="form-group row">
                                         <div class="mx-auto">
-                                            @if($query->lawyer_id==null)
-                                                <button name="action" value="get" class="btn btn-danger text-white">
-                                                    Get this Query
-                                                </button>
-                                            @elseif($query->status == 'In-Progress' )
+                                            @if($query->status == 'In-Progress' )
                                                 <button name="action" value="complete" class="btn btn-primary-btn text-white" @if(Carbon\Carbon::parse($event_check->end_time)->gte(Carbon\Carbon::now())) disabled @endif>
                                                     Complete
                                                 </button>
                                             @elseif($query->resolution_type == 'Written Resolution from a Lawyer' && $query->status != 'Complete')
-                                                <button name="action" value="send" class="btn btn-primary-btn text-white">
-                                                    Send
-                                                </button>
-                                                <button name="action" value="decline" class="btn btn-danger text-white">
-                                                    Decline
-                                                </button>
-                                            @elseif($query->category == "Offline Consultation"  &&  $query->status == 'Pending' )
+                                                @if($query->lawyer_id==null)
+                                                    @if($query->category == "Offline Consultation" || $query->resolution_type == 'Written Resolution from a Lawyer')
+                                                        <button name="action" value="acceptOffline" class="btn btn-primary-btn text-white">
+                                                            Accept
+                                                        </button>
+                                                        <button name="action" value="declineOffline" class="btn btn-danger text-white">
+                                                            Decline 
+                                                        </button>
+                                                    @else
+                                                        <button name="action" value="accept" class="btn btn-primary-btn text-white">
+                                                            Accept
+                                                        </button>
+                                                        <button name="action" value="decline" class="btn btn-danger text-white">
+                                                            Decline
+                                                        </button>
+                                                    @endif
+                                                @else
+                                                    <button name="action" value="send" class="btn btn-primary-btn text-white">
+                                                        Send
+                                                    </button>
+                                                @endif
+                                            @elseif($query->category == "Offline Consultation"  &&  $query->status == 'Pending' && $query->lawyer_id==null)
                                                 <button name="action" value="acceptOffline" class="btn btn-primary-btn text-white">
                                                     Accept 
                                                 </button>
                                                 <button name="action" value="declineOffline" class="btn btn-danger text-white">
                                                     Decline 
                                                 </button>
-                                            @elseif($query->status == 'Pending')
+                                            @elseif($query->status == 'Pending' && $query->lawyer_id==null)
                                                 <button name="action" value="accept" class="btn btn-primary-btn text-white">
                                                     Accept
                                                 </button>

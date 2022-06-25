@@ -89,14 +89,23 @@ class ProfileController extends Controller
 
         }else if($role_id == 2)
         {
-            $queries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
-            $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
+            $arrDeclined = [];
+            $nqueries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
+
+            foreach($nqueries as $query) {
+                if($query->declined_id) {
+                    $declineID = json_decode($query->declined_id);
+                    if($declineID->declined_id==Auth::User()->id)
+                        array_push($arrDeclined, $query->id);
+                }
+            }
+            $queries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
+            $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
             // $queries = Query::where('lawyer_id', $user_id)->get();
         }else{
             $queries = Query::with('lawyer')->get();
             $pending_queries = '';
         }
-
         
         return view('profile.query', compact('queries', 'pending_queries'));
     }

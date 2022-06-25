@@ -42,7 +42,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav mr-auto">
-                    <a href="{{ route('home') }}" class="ml-5 nav-link font-weight-bold">Home</a>
+                    <a href="{{ url('/') }}" class="ml-5 nav-link font-weight-bold">Home</a>
                     <a href="{{ route('about') }}" class="ml-5 nav-link font-weight-bold">About Us</a>
                     {{-- <a href="{{ route('services') }}" class="ml-5 nav-link font-weight-bold">Services We Offer</a> --}}
                     <li class="nav-item dropdown">

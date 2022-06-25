@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Collection;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,22 +20,27 @@ if (!empty($app_url)) {
     URL::forceScheme($schema);
 }
 
-
-Route::get('/', function () {
-    return redirect('home');
-});
-
-Route::get('/OnCon/', function () {
-    return redirect('home');
-});
-
 use App\User;
 
-Auth::routes(['verify' => true]);
-Auth::routes(['register' => false]);
+Auth::routes([
+    'verify' => true
+]);
+
+Route::get('/', function () {
+    if(Auth::user())
+        return redirect('home');
+    else
+        return view('home');
+});
 
 Route::middleware(['verified'])->group(function (){
-
+    
+    Route::get('/OnCon/', function () {
+        return redirect('home');
+    });
+  
+    Route::get('/home', 'HomeController@index')->name('home');
+    
     // LAWYER ENDPOINTS
     Route::get('/lawyer/query/{id}', 'LawyerController@LawyerQuery')->name('lawyer.query');
 
@@ -114,13 +118,13 @@ Route::middleware(['verified'])->group(function (){
 
     Route::post('/online/submit', 'QueryController@SubmitQuery')->name('online.submit');
 
-
+    Route::get('/print/{id}','QueryController@print');
 });
 
 
 
 
-Route::get('/home', 'HomeController@index')->name('home');
+
 Route::get('/about', 'HomeController@about')->name('about');
 Route::get('/services', 'HomeController@services')->name('services');
 Route::get('/contact', 'HomeController@contact')->name('contact');
