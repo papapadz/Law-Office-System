@@ -90,7 +90,7 @@ class ProfileController extends Controller
         }else if($role_id == 2)
         {
             $arrDeclined = [];
-            $nqueries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->get();
+            $nqueries = Query::where([['lawyer_id', $user_id],['status','!=','Declined']])->orWhere('lawyer_id',null)->get();
 
             foreach($nqueries as $query) {
                 if($query->declined_id) {
@@ -99,7 +99,7 @@ class ProfileController extends Controller
                         array_push($arrDeclined, $query->id);
                 }
             }
-            $queries = Query::where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
+            $queries = Query::where([['lawyer_id', $user_id],['status','!=','Declined']])->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
             $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
             // $queries = Query::where('lawyer_id', $user_id)->get();
         }else{

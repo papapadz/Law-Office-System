@@ -12,7 +12,36 @@
             <div class="card-body" id="printDiv">
                 <div class="row">
                     <div class="col-md-4">
-                        Transaction Number: {{ $query->transaction_number }}
+                        Transaction Number: <b>{{ $query->transaction_number }}</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Client Name: <b>{{ $query->client->last_name }}, {{ $query->client->first_name }}</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Lawyer Name: <b>{{ $query->lawyer->last_name }}, {{ $query->lawyer->first_name }}</b>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        Date: <b>{{ Carbon\Carbon::parse($query->schedule_date)->toFormattedDateString() }}</b>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>RESOLUTION</h5> <br>
+                        {{ $query->reply_to_written_resolution ?? $query->reply_offline }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>SUMMARY</h5> <br>
+                        {{ $query->summary_from_lawyer }}
                     </div>
                 </div>
             </div>

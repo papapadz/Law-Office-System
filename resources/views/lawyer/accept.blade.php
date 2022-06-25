@@ -373,6 +373,11 @@
                                 </div>
                             </div>
 
+                            <div class="form-group row">
+                                <div class="col-md-12 text-md-center">
+                                    <a class="btn btn-warning " href="{{ url('print/'.$query->transaction_number) }}">Print</a>
+                                </div>
+                            </div>
                             @elseif($query->resolution_type == 'Video Conference with a Lawyer' && $query->status == 'Pending')
                             <div class="form-group row">
                                 <label for="schedule" class="col-md-12 col-form-label text-md-center">{{ __('Please choose one from the available schedules sent by the customer') }}</label>
@@ -618,6 +623,11 @@
                                                 <strong>{{ $message }}</strong>
                                             </span>
                                             @enderror
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-12 text-md-center">
+                                            <a class="btn btn-warning " href="{{ url('print/'.$query->transaction_number) }}">Print</a>
                                         </div>
                                     </div>
                                     @endif
