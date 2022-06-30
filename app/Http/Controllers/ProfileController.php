@@ -345,7 +345,7 @@ class ProfileController extends Controller
             /** Update query */
             $newQuery = Query::where('transaction_number', $request->transaction_number)->first();
             $newQuery->question = $request->question;
-            $newQuery->subject = Specialization::find($request->subject)->specialization;
+            $newQuery->subject = $request->subject;
             $newQuery->status = 'Pending';
             $newQuery->available_date_1 = $request->available_date_1;
             $newQuery->available_date_2 = $request->available_date_2;
@@ -357,7 +357,7 @@ class ProfileController extends Controller
             /** Call Query-Lawyer Matchmaking Algo */
             $queryController = new QueryController;
             //send email to lawyers
-            $newQuery->lawyer_id = $queryController->sendLawyerEmail($request);
+            $newQuery->lawyer_id = $queryController->sendLawyerEmail($request,$request->transaction_number);
             //save new updated query info
             $newQuery->save();
 
@@ -405,7 +405,7 @@ class ProfileController extends Controller
 
         $queries = Query::where('transaction_number', $transaction_number)->first();
 
-        $proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
+        $proof_photo = 'adasdasd.jpg'; //request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
         
         $queries->proof_photo_url = $proof_photo;
         $queries->save();
@@ -414,221 +414,37 @@ class ProfileController extends Controller
         
         $payments = new Payment();
         $payments->payment_number = $randon_number;
-        $payments->client_id =auth()->user()->id;
+        $payments->client_id = Auth::user()->id;
         $payments->payment_status = "Pending";
         $payments->proof_payment_path = $proof_photo;
         $payments->save();
 
         /** Check query has been accepted by a lawyer
          *  If query is assigned, send an email to the lawyer
-         *  Else, query all eligible lawyers and send them an email to accept query
+         *  Else, query admin and send an email
          */
+        $details = [
+            'title' => 'Payment has been Made',
+            'ReferenceNumber' => $request->transaction_number,
+            'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
+        ];
+
+        $from = env('MAIL_FROM_ADDRESS');
+        $name = env('MAIL_FROM_NAME');
+        $subject = 'Payment has been Made';
+
         if($queries->lawyer_id) {
-            $details = [
-                'title' => 'Payment has been Made',
-                'ReferenceNumber' => $request->transaction_number,
-                'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
-            ];
-
-            $from = env('MAIL_FROM_ADDRESS');
-            $name = env('MAIL_FROM_NAME');
-            $subject = 'Payment has been Made';
-
+        
             $to = $queries->lawyer->email;
-
             \Mail::to($to)->send(new NotifMail($details));
         } else {
             
-            $availabilityQuery = 'Offline';
-            if($queries->category != 'Online Consultation')
-                $availabilityQuery = 'Online';
+           $admins = User::where([['role_id',3],['is_verified',true]])->get();
 
-            $users = User::where('role_id', 2)->where('is_verified', 1)->where('availability', '!=', $availabilityQuery)->get();
-
-            foreach($users as $user)
-            {
-                $availableSubject = $users->pluck('specialization');
-                $availSub = explode('-', $availableSubject);
-
-                if(strpos($availableSubject, $queries->subject) !== false)
-                {
-                    $lawyers = User::where('role_id', 2)
-                        ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
-                        ->where([
-                            ['specialization', 'LIKE', '%'.$queries->subject.'%'],['availability', '!=', $availabilityQuery]
-                        ])
-                        ->orWhere([
-                            ['from', '<=', $queries->available_time_1], ['from', '<=', $queries->available_time_2], ['from', '<=', $queries->available_time_3]
-                        ])
-                        ->get();
-                    
-                    $requestedDates = [$queries->available_date_1,$queries->available_date_2,$queries->available_date_3]; //save requested dates to  an array
-                    $requestedTimes = [$queries->available_time_1,$queries->available_time_2,$queries->available_time_3]; //save requested time to  an array
-                    
-                    if($lawyers) {
-                        
-                        $lawyersAvailableCount = 0;
-                        foreach($lawyers as $lawyer) 
-                        {
-                            /** get assigned queries to a lawyer */
-                            $lawyerQueries = Query::where('lawyer_id',$lawyer->id)->get();
-        
-                            /** check for conflicts in schedule */
-                            $conflicts = 0; //conflict counter
-                            foreach($lawyerQueries as $lawyerQuery) {
-        
-                                foreach($requestedDates as $k => $requestedDate) {
-        
-                                    /** check if a query assigned to a lawyer 
-                                     *  if requested date is the same, check also if the difference in time is more than 2 hours
-                                     */
-                                    if($lawyerQuery->assigned_date==$requestedDate) { 
-                                        $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
-                                        if(Carbon\Carbon::parse($lawyerQuery->schedule_date.' '.$lawyerQuery->schedule_time)->diffInHours($requestedTimeItem)<2)
-                                            $conflicts++;
-                                    }
-                                }
-                            }
-        
-                            // if conflict == 0 send this query to the specialized lawyers
-                            if($conflicts==0) {
-                                $lawyersAvailableCount++;
-                                $details = [
-                                    'title' => 'Payment has been Made',
-                                    'ReferenceNumber' => $request->transaction_number,
-                                    'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
-                                ];
-            
-                                $from = env('MAIL_FROM_ADDRESS');
-                                $name = env('MAIL_FROM_NAME');
-                                $subject = 'Payment has been Made';
-            
-                                $to = $lawyer->email;
-            
-                                \Mail::to($to)->send(new NotifMail($details));
-                            }
-                        }
-
-                        if($lawyersAvailableCount==0) //if value is 0, no lawyer time frame is available, so send query to lawyers with specializations with the subject
-                        {
-                            foreach($lawyers as $lawyer) {
-                                $details = [
-                                    'title' => 'Payment has been Made',
-                                    'ReferenceNumber' => $request->transaction_number,
-                                    'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
-                                ];
-            
-                                $from = env('MAIL_FROM_ADDRESS');
-                                $name = env('MAIL_FROM_NAME');
-                                $subject = 'Payment has been Made';
-            
-                                $to = $lawyer->email;
-            
-                                \Mail::to($to)->send(new NotifMail($details));
-                            }
-                        }
-                    } else //if no lawyers available assign to general specialization
-                    {
-                        $lawyers = User::where('role_id', 2)
-                        ->where('specialization', 'LIKE', '%General%' )
-                        ->where('availability', '!=', 'Offline')
-                        ->get();
-        
-                        $assigned = null;
-                        foreach($lawyers as $lawyer) 
-                        {
-                            $query_count = $lawyers->pluck('totalAssigned'); 
-        
-                            if($query_count === [0]) 
-                            {
-                                $assigned = collect($lawyers)->sortBy('created_at')->first(); 
-                            }
-                            elseif($query_count >= [1] ) 
-                            {
-                                $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
-                            }
-                            else 
-                            {
-        
-                                $filtered = $lawyers->filter(function($value, $key) 
-                                {
-                                    $value['date_of_last_query'] == NULL; 
-                                });
-        
-                                $assigned = collect($filtered)->sortBy('created_at')->first(); 
-                            }
-                        }
-
-                        $details = [
-                            'title' => 'Payment has been Made',
-                            'ReferenceNumber' => $request->transaction_number,
-                            'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
-                        ];
-    
-                        $from = env('MAIL_FROM_ADDRESS');
-                        $name = env('MAIL_FROM_NAME');
-                        $subject = 'Payment has been Made';
-    
-                        $to = User::find($assigned->id)->email;
-    
-                        \Mail::to($to)->send(new NotifMail($details));
-
-                        $queries = new Query;
-                        $queries->lawyer_id = $assigned->id;
-                        $queries->save();
-                    }
-                }
-                else
-                {
-                    
-                    $lawyers = User::where('role_id', 2)
-                    ->where('specialization', 'LIKE', '%General%' )
-                    ->where('availability', '!=', 'Offline')
-                    ->get();
-
-                    foreach($lawyers as $lawyer) 
-                    {
-                        $query_count = $lawyers->pluck('totalAssigned'); 
-
-                        if($query_count === [0]) 
-                        {
-                            $assigned = collect($lawyers)->sortBy('created_at')->first(); 
-                        }
-                        elseif($query_count >= [1] ) 
-                        {
-                            $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
-                        }
-                        else 
-                        {
-
-                            $filtered = $lawyers->filter(function($value, $key) 
-                            {
-                                return $value['date_of_last_query'] == NULL; 
-                            });
-
-                            $assigned = collect($filtered)->sortBy('created_at')->first(); 
-                        }
-                    }
-
-                    $details = [
-                        'title' => 'Payment has been Made',
-                        'ReferenceNumber' => $queries->transaction_number,
-                        'body' => 'Please check your OnCon account, please verify proof of payment for a Query.' 
-                    ];
-
-                    $from = env('MAIL_FROM_ADDRESS');
-                    $name = env('MAIL_FROM_NAME');
-                    $subject = 'Payment has been Made';
-
-                    $to = User::find($assigned->id)->email;
-
-                    \Mail::to($to)->send(new NotifMail($details));
-
-                    $queries = new Query;
-                    $queries->lawyer_id = $assigned->id;
-                    $queries->save();
-                }
-            }
+           foreach($admins as $admin) {
+                $to = $admin->email;
+                \Mail::to($to)->send(new NotifMail($details));
+           }
         }
         /** */
         

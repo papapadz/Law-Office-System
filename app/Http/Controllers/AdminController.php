@@ -213,9 +213,9 @@ class AdminController extends Controller
             $queries->save();
 
             $details = [
-            'title' => 'Approved Proof of Payment',
-            'ReferenceNumber' => $queries->transaction_number,
-            'body' => 'We are pleased to inform that your proof of payment is approve. Update on your transaction will be sent soon. Thank you.'
+                'title' => 'Approved Proof of Payment',
+                'ReferenceNumber' => $queries->transaction_number,
+                'body' => 'We are pleased to inform that your proof of payment is approve. Update on your transaction will be sent soon. Thank you.'
             ];
 
             $from = env('MAIL_FROM_ADDRESS');
@@ -227,6 +227,122 @@ class AdminController extends Controller
             \Mail::to($to)->send(new NotifMail($details));
 
             toast()->success('Success', 'Query successfully assigned! Lawyer is notified.')->position('top-end');
+
+            if($queries->lawyer_id) {
+                $details = [
+                    'title' => 'Approved Proof of Payment',
+                    'ReferenceNumber' => $queries->transaction_number,
+                    'body' => 'A Proof of Payment is approved. You can proceed with this Query now.'
+                ];
+                $to = $queries->lawyer->email;
+                \Mail::to($to)->send(new NotifMail($details));
+            } else {
+
+                $lawyersAvailableCount = 0;
+                $requestedDates = [$queries->available_date_1,$queries->available_date_2,$queries->available_date_3]; //save requested dates to  an array
+                $requestedTimes = [$queries->available_time_1,$queries->available_time_2,$queries->available_time_3]; //save requested time to  an array
+                
+                $user_specializations = LawyerSpecialization::where('specialization_id',$queries->subject)->get();
+
+                foreach($user_specializations as $user_specialization) {
+                    
+                    $lawyer = $user_specialization->user;
+                    
+                    if($lawyer->availability != 'Offline') {
+                        
+                        if($queries->resolution_type == 'Video Conference with a Lawyer') {
+                            /** check for conflicts in schedule */
+                            $conflicts = 0; //conflict counter
+                            $lawyer_queries = $lawyer->queries->where('status','Pending');
+
+                            if(count($lawyer_queries)>0) {
+                                foreach($lawyer_queries as $lawyer_query) {
+                                    foreach($requestedDates as $k => $requestedDate) {
+                                        /** check if a query assigned to a lawyer 
+                                         *  if requested date is the same, check also if the difference in time is more than 2 hours
+                                         */
+                                        if($lawyer_query->schedule_date==$requestedDate) { 
+                                            $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
+                                            if(Carbon\Carbon::parse($lawyer_query->schedule_date.' '.$lawyer_query->schedule_time)->diffInHours($requestedTimeItem)<2)
+                                                $conflicts++;
+                                        }
+                                    }
+                                }
+                                if($conflicts==0) {
+                                    $lawyersAvailableCount++;
+                                    $details = [
+                                        'title' => 'Approved Proof of Payment',
+                                        'ReferenceNumber' => $queries->transaction_number,
+                                        'body' => 'A Query Proof of Payment is approved. You might want to accept this query.'
+                                    ];
+                                    $from = env('MAIL_FROM_ADDRESS');
+                                    $name = env('MAIL_FROM_NAME');
+                                    $subject = 'Approved Proof of Payment';   
+                                    $to = $lawyer->email;                        
+                                    \Mail::to($to)->send(new NotifMail($details));
+                                }
+                            }
+                        } else {
+                            $lawyersAvailableCount++;
+                            $details = [
+                                'title' => 'Approved Proof of Payment',
+                                'ReferenceNumber' => $queries->transaction_number,
+                                'body' => 'A Query Proof of Payment is approved. You might want to accept this query.'
+                            ];
+                            $from = env('MAIL_FROM_ADDRESS');
+                            $name = env('MAIL_FROM_NAME');
+                            $subject = 'You Have a New Query Match';   
+                            $to = $lawyer->email;                        
+                            \Mail::to($to)->send(new NotifMail($details));
+                        }
+                    }
+                }
+
+                /**if no lawyers available */
+                if($lawyersAvailableCount==0) {
+
+                    //send email to all lawyers with that specialization
+                    foreach($user_specializations as $user_specialization) {
+                        $lawyer = $user_specialization->user;
+                        if($lawyer->availability != 'Offline') {
+                            $lawyersAvailableCount++;
+                            $details = [
+                                'title' => 'Approved Proof of Payment',
+                                'ReferenceNumber' => $queries->transaction_number,
+                                'body' => 'A Query Proof of Payment is approved. You might want to accept this query.'
+                            ];
+                            $from = env('MAIL_FROM_ADDRESS');
+                            $name = env('MAIL_FROM_NAME');
+                            $subject = 'You Have a New Query Match';   
+                            $to = $lawyer->email;                        
+                            \Mail::to($to)->send(new NotifMail($details));
+                        }
+                    }
+
+                    //if no lawyer is still available, send to general lawyers
+                    if($lawyersAvailableCount==0) {
+                        //get general lawyers
+                        $user_specializations = LawyerSpecialization::where('specialization_id',1)->get();
+                        foreach($user_specializations as $user_specialization) {
+                            $lawyer = $user_specialization->user;
+                            if($lawyer->availability != 'Offline') {
+                                $lawyersAvailableCount++;
+                                $details = [
+                                    'title' => 'Approved Proof of Payment',
+                                    'ReferenceNumber' => $queries->transaction_number,
+                                    'body' => 'A Query Proof of Payment is approved. You might want to accept this query.'
+                                ];
+                                $from = env('MAIL_FROM_ADDRESS');
+                                $name = env('MAIL_FROM_NAME');
+                                $subject = 'You Have a New Query Match';   
+                                $to = $lawyer->email;                        
+                                \Mail::to($to)->send(new NotifMail($details));
+                            }
+                        }
+                    }
+                }
+            }
+
         }elseif($request->input('action') == 'declineProof')
         {
             $queries = Query::where('transaction_number', $request->transaction_number)->first();

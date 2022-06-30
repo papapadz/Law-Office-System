@@ -222,7 +222,7 @@ class LawyerController extends Controller
             $declineIDs['declined_id'] = Auth::User()->id;
             $queries->declined_id = $declineIDs;
             //$queries->lawyer_id = $this->getLawyer(request()->subject);
-            $queries->status = 'Pending';
+            $queries->status = 'Declined';
             $queries->save();
 
             // $details = [
@@ -379,7 +379,9 @@ class LawyerController extends Controller
         elseif($request->input('action') == 'declineOffline')
         {
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
-            $queries->status ='Declined';
+            $declineIDs['declined_id'] = Auth::User()->id;
+            $queries->declined_id = $declineIDs;
+            $queries->status = 'Declined';
             $queries->save();
 
             $details = [
