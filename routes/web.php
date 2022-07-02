@@ -41,13 +41,6 @@ Route::middleware(['verified'])->group(function (){
   
     Route::get('/home', 'HomeController@index')->name('home');
     
-    // LAWYER ENDPOINTS
-    Route::get('/lawyer/query/{id}', 'LawyerController@LawyerQuery')->name('lawyer.query');
-
-    Route::post('/lawyer/query', 'LawyerController@AcceptOnlineQuery')->name('lawyer.accept');
-
-    // LAWYER ENDPOINTS
-
     // ADMIN ENDPOINTS
     /** all admin pages will be checked via Admin Middleware, non admins cannot access the following routes */
     Route::middleware(['admin'])->group(function() {
@@ -87,30 +80,40 @@ Route::middleware(['verified'])->group(function (){
     });
     // ADMIN ENDPOINTS
 
+    /** Added middleware for Clients and Lawyers */
+    // LAWYER ENDPOINTS
+    Route::middleware(['lawyer.only'])->group(function() {
+        
+        Route::get('/lawyer/query/{id}', 'LawyerController@LawyerQuery')->name('lawyer.query');
+
+        Route::post('/lawyer/query', 'LawyerController@AcceptOnlineQuery')->name('lawyer.accept'); 
+    });
+    // LAWYER ENDPOINTS
+    
+    Route::middleware(['user.only'])->group(function() {
+        
+        Route::get('/user/profile', 'ProfileController@profile')->name('user.profile');
+
+        Route::post('/user/profile/changepassword', 'ProfileController@ChangePassword')->name('user.changepassword');
+
+        Route::post('/user/profile/updateprofile', 'ProfileController@UpdateProfile')->name('user.updateprofile');
+
+        Route::get('/user/query', 'ProfileController@query')->name('user.queries');
+
+        Route::get('/user/query/{id}', 'ProfileController@QueryProfile')->name('user.query');
+
+        Route::post('/user/accept', 'ProfileController@AcceptQuery')->name('user.accept');
+
+        Route::get('/payment/details/{id}', 'ProfileController@PaymentDetails')->name('payment.details');
+
+        Route::post('/payment/upload', 'ProfileController@UploadPayment')->name('payment.upload');
+
+        Route::post('/profile/upload', 'ProfileController@UploadProfilePicture')->name('profile.upload');
+    });
+    
     Route::get('/online/query', 'QueryController@onlinequery')->name('online.query');
 
     Route::get('/offline/query', 'QueryController@offlinequery')->name('offline.query');
-
-    
-
-    Route::get('/user/profile', 'ProfileController@profile')->name('user.profile');
-
-    Route::post('/user/profile/changepassword', 'ProfileController@ChangePassword')->name('user.changepassword');
-
-    Route::post('/user/profile/updateprofile', 'ProfileController@UpdateProfile')->name('user.updateprofile');
-
-    Route::get('/user/query', 'ProfileController@query')->name('user.queries');
-
-    Route::get('/user/query/{id}', 'ProfileController@QueryProfile')->name('user.query');
-
-    Route::post('/user/accept', 'ProfileController@AcceptQuery')->name('user.accept');
-
-    Route::get('/payment/details/{id}', 'ProfileController@PaymentDetails')->name('payment.details');
-
-    Route::post('/payment/upload', 'ProfileController@UploadPayment')->name('payment.upload');
-
-    Route::post('/profile/upload', 'ProfileController@UploadProfilePicture')->name('profile.upload');
-
 
     Route::post('/online/query', 'QueryController@StoreOnlineQuery')->name('store.online.query');
 

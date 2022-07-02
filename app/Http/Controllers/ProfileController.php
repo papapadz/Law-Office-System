@@ -89,18 +89,41 @@ class ProfileController extends Controller
 
         }else if($role_id == 2)
         {
-            $arrDeclined = [];
-            $nqueries = Query::where([['lawyer_id', $user_id],['status','!=','Declined']])->orWhere('lawyer_id',null)->get();
+            /** check lawyer availability */
+            $category = ['Offline Consultation','Online Consultation'];
+            if(Auth::User()->availability=='Offline')
+                $category = ['Offline Consultation'];
+            else if(Auth::User()->availability=='Online')
+                $category = ['Online Consultation'];
+            
+            /** get pending queries (no lawyers yet) */
+            $nullqueries = Query::where([
+                ['status','!=','Declined'],
+                ['subject',Auth::User()->specialization],
+                ['lawyer_id', null]
+            ])
+            ->whereIn('category',$category)
+            ->get();
+            
 
-            foreach($nqueries as $query) {
-                if($query->declined_id) {
-                    $declineID = json_decode($query->declined_id);
-                    if($declineID->declined_id==Auth::User()->id)
-                        array_push($arrDeclined, $query->id);
-                }
-            }
-            $queries = Query::where([['lawyer_id', $user_id],['status','!=','Declined']])->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
-            $pending_queries = Query::where('status', 'Pending')->where('lawyer_id', $user_id)->orWhere('lawyer_id',null)->whereNotIn('id',$arrDeclined)->get();
+             /** get pending queries assigned to logged in lawyer */
+            $assignedqueries = Query::where([
+                ['status','!=','Declined'],
+                ['subject',Auth::User()->specialization],
+                ['lawyer_id', Auth::User()->id] 
+            ])
+            ->whereIn('category',$category)
+            ->get();
+
+            /** merge them */
+            $queries = $nullqueries->merge($assignedqueries);
+            
+            $pending_queries = Query::where([
+                ['status','Pending'],
+                ['subject',Auth::User()->specialization],
+                ['lawyer_id', Auth::User()->id] 
+            ])->get();
+            
             // $queries = Query::where('lawyer_id', $user_id)->get();
         }else{
             $queries = Query::with('lawyer')->get();
@@ -405,7 +428,7 @@ class ProfileController extends Controller
 
         $queries = Query::where('transaction_number', $transaction_number)->first();
 
-        $proof_photo = 'adasdasd.jpg'; //request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
+        $proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
         
         $queries->proof_photo_url = $proof_photo;
         $queries->save();

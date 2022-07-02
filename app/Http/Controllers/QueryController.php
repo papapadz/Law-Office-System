@@ -171,7 +171,7 @@ class QueryController extends Controller
         $query->transaction_number = $randon_number;
         //$choosenlawyer = $this->getLawyer($request);
         //$query->lawyer_id = $choosenlawyer;      
-        $query->lawyer_id = $this->sendLawyerEmail($request,$randon_number);
+        //$query->lawyer_id = $this->sendLawyerEmail($request,$randon_number);
         $query->save();
 
         // $lawyer = User::where('id', $choosenlawyer)->first();
@@ -285,265 +285,274 @@ class QueryController extends Controller
     /** Query-Lawyer matchmaking algorithm
      *  this function sends an email to lawyers who are eligible for the submitted query
     */
-    public function sendLawyerEmail(Request $request, $transaction_number) {
+    // public function sendLawyerEmail(Request $request, $transaction_number) {
 
-        $lawyersAvailableCount = 0;
-        $requestedDates = [$request->available_date_1,$request->available_date_2,$request->available_date_3]; //save requested dates to  an array
-        $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
+    //     $lawyersAvailableCount = 0;
+    //     $requestedDates = [$request->available_date_1,$request->available_date_2,$request->available_date_3]; //save requested dates to  an array
+    //     $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
         
-        $user_specializations = LawyerSpecialization::where('specialization_id',$request->subject)->get();
+    //     $user_specializations = LawyerSpecialization::where('specialization_id',$request->subject)->get();
 
-        foreach($user_specializations as $user_specialization) {
+    //     foreach($user_specializations as $user_specialization) {
             
-            $lawyer = $user_specialization->user;
+    //         $lawyer = $user_specialization->user;
             
-            if($lawyer->availability != 'Offline') {
+    //         if($lawyer->availability == 'Offline') {
                 
-                if($request->resolution_type == 'Video Conference with a Lawyer') {
-                    /** check for conflicts in schedule */
-                    $conflicts = 0; //conflict counter
-                    $lawyer_queries = $lawyer->queries->where('status','Pending');
+    //             if($request->resolution_type == 'Video Conference with a Lawyer') {
+    //                 /** check for conflicts in schedule */
+    //                 $conflicts = 0; //conflict counter
+    //                 $lawyer_queries = $lawyer->queries->where('status','Pending');
 
-                    if(count($lawyer_queries)>0) {
-                        foreach($lawyer_queries as $lawyer_query) {
-                            foreach($requestedDates as $k => $requestedDate) {
-                                /** check if a query assigned to a lawyer 
-                                 *  if requested date is the same, check also if the difference in time is more than 2 hours
-                                 */
-                                if($lawyer_query->schedule_date==$requestedDate) { 
-                                    $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
-                                    if(Carbon\Carbon::parse($lawyer_query->schedule_date.' '.$lawyer_query->schedule_time)->diffInHours($requestedTimeItem)<2)
-                                        $conflicts++;
-                                }
-                            }
-                        }
-                        if($conflicts==0) {
-                            $lawyersAvailableCount++;
-                            $details = [
-                                'title' => 'New Query Match',
-                                'ReferenceNumber' => $transaction_number,
-                                'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-                            ];
-                            $from = env('MAIL_FROM_ADDRESS');
-                            $name = env('MAIL_FROM_NAME');
-                            $subject = 'You Have a New Query Match';   
-                            $to = $lawyer->email;                        
-                            \Mail::to($to)->send(new NotifMail($details));
-                        }
-                    }
-                } else {
-                    $lawyersAvailableCount++;
-                    $details = [
-                        'title' => 'New Query Match',
-                        'ReferenceNumber' => $transaction_number,
-                        'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-                    ];
-                    $from = env('MAIL_FROM_ADDRESS');
-                    $name = env('MAIL_FROM_NAME');
-                    $subject = 'You Have a New Query Match';   
-                    $to = $lawyer->email;                        
-                    \Mail::to($to)->send(new NotifMail($details));
-                }
-            }
-        }
+    //                 if(count($lawyer_queries)>0) {
+    //                     foreach($lawyer_queries as $lawyer_query) {
+    //                         foreach($requestedDates as $k => $requestedDate) {
+    //                             /** check if a query assigned to a lawyer 
+    //                              *  if requested date is the same, check also if the difference in time is more than 2 hours
+    //                              */
+    //                             if($lawyer_query->schedule_date==$requestedDate) { 
+    //                                 $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
+    //                                 if(Carbon\Carbon::parse($lawyer_query->schedule_date.' '.$lawyer_query->schedule_time)->diffInHours($requestedTimeItem)<2)
+    //                                     $conflicts++;
+    //                             }
+    //                         }
+    //                     }
+    //                     if($conflicts==0) {
+    //                         if($lawyer->is_verified) {
+    //                             $lawyersAvailableCount++;
+    //                             $details = [
+    //                                 'title' => 'New Query Match',
+    //                                 'ReferenceNumber' => $transaction_number,
+    //                                 'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //                             ];
+    //                             $from = env('MAIL_FROM_ADDRESS');
+    //                             $name = env('MAIL_FROM_NAME');
+    //                             $subject = 'You Have a New Query Match';   
+    //                             $to = $lawyer->email;                        
+    //                             \Mail::to($to)->send(new NotifMail($details));
+    //                         }
+    //                     }
+    //                 }
+    //             } else {
+    //                 if($lawyer->is_verified) {
+    //                     $lawyersAvailableCount++;
+    //                     $details = [
+    //                         'title' => 'New Query Match',
+    //                         'ReferenceNumber' => $transaction_number,
+    //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //                     ];
+    //                     $from = env('MAIL_FROM_ADDRESS');
+    //                     $name = env('MAIL_FROM_NAME');
+    //                     $subject = 'You Have a New Query Match';   
+    //                     $to = $lawyer->email;                        
+    //                     \Mail::to($to)->send(new NotifMail($details));
+    //                 }
+    //             }
+    //         } else {
+    //             $user_specializations = LawyerSpecialization::where('specialization_id',$request->subject)->get();
 
-        /**if no lawyers available */
-        if($lawyersAvailableCount==0) {
-
-            //send email to all lawyers with that specialization
-            foreach($user_specializations as $user_specialization) {
-                $lawyer = $user_specialization->user;
-                if($lawyer->availability != 'Offline') {
-                    $lawyersAvailableCount++;
-                    $details = [
-                        'title' => 'New Query Match',
-                        'ReferenceNumber' => $transaction_number,
-                        'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-                    ];
-                    $from = env('MAIL_FROM_ADDRESS');
-                    $name = env('MAIL_FROM_NAME');
-                    $subject = 'You Have a New Query Match';   
-                    $to = $lawyer->email;                        
-                    \Mail::to($to)->send(new NotifMail($details));
-                }
-            }
-
-            //if no lawyer is still available, send to general lawyers
-            if($lawyersAvailableCount==0) {
-                //get general lawyers
-                $user_specializations = LawyerSpecialization::where('specialization_id',1)->get();
-                foreach($user_specializations as $user_specialization) {
-                    $lawyer = $user_specialization->user;
-                    if($lawyer->availability != 'Offline') {
-                        $lawyersAvailableCount++;
-                        $details = [
-                            'title' => 'New Query Match',
-                            'ReferenceNumber' => $transaction_number,
-                            'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-                        ];
-                        $from = env('MAIL_FROM_ADDRESS');
-                        $name = env('MAIL_FROM_NAME');
-                        $subject = 'You Have a New Query Match';   
-                        $to = $lawyer->email;                        
-                        \Mail::to($to)->send(new NotifMail($details));
-                    }
-                }
-            }
-        }
-        // foreach($users as $user)
-        // {
-        //     $availableSubject = $users->pluck('specialization');
-        //     $availSub = explode('-', $availableSubject);
-
-        //     if(strpos($availableSubject, $request->subject) !== false)
-        //     {
-        //         $lawyers = User::where('role_id', 2)
-        //             ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
-        //             ->where([
-        //                 ['specialization', 'LIKE', '%'.$request->subject.'%'],['availability', '!=', 'Offline']
-        //             ])
-        //             ->orWhere([
-        //                 ['from', '<=', $request->available_time_1], ['from', '<=', $request->available_time_2], ['from', '<=', $request->available_time_3]
-        //             ])
-        //             ->get();
+    //             foreach($user_specializations as $user_specialization) {
                 
-        //         $requestedDates = [$request->available_date_1,$request->available_date_2,$request->available_date_3]; //save requested dates to  an array
-        //         $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
+    //             }
+    //     }
+
+    //     /**if no lawyers available */
+    //     if($lawyersAvailableCount==0) {
+
+    //         //send email to all lawyers with that specialization
+    //         foreach($user_specializations as $user_specialization) {
+    //             $lawyer = $user_specialization->user;
+    //             if($lawyer->availability != 'Offline') {
+    //                 $lawyersAvailableCount++;
+    //                 $details = [
+    //                     'title' => 'New Query Match',
+    //                     'ReferenceNumber' => $transaction_number,
+    //                     'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //                 ];
+    //                 $from = env('MAIL_FROM_ADDRESS');
+    //                 $name = env('MAIL_FROM_NAME');
+    //                 $subject = 'You Have a New Query Match';   
+    //                 $to = $lawyer->email;                        
+    //                 \Mail::to($to)->send(new NotifMail($details));
+    //             }
+    //         }
+
+    //         //if no lawyer is still available, send to general lawyers
+    //         if($lawyersAvailableCount==0) {
+    //             //get general lawyers
+    //             $user_specializations = LawyerSpecialization::where('specialization_id',1)->get();
+    //             foreach($user_specializations as $user_specialization) {
+    //                 $lawyer = $user_specialization->user;
+    //                 if($lawyer->availability != 'Offline') {
+    //                     $lawyersAvailableCount++;
+    //                     $details = [
+    //                         'title' => 'New Query Match',
+    //                         'ReferenceNumber' => $transaction_number,
+    //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //                     ];
+    //                     $from = env('MAIL_FROM_ADDRESS');
+    //                     $name = env('MAIL_FROM_NAME');
+    //                     $subject = 'You Have a New Query Match';   
+    //                     $to = $lawyer->email;                        
+    //                     \Mail::to($to)->send(new NotifMail($details));
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     // foreach($users as $user)
+    //     // {
+    //     //     $availableSubject = $users->pluck('specialization');
+    //     //     $availSub = explode('-', $availableSubject);
+
+    //     //     if(strpos($availableSubject, $request->subject) !== false)
+    //     //     {
+    //     //         $lawyers = User::where('role_id', 2)
+    //     //             ->join('lawyer_time_frames','lawyer_time_frames.lawyer_id','users.id')
+    //     //             ->where([
+    //     //                 ['specialization', 'LIKE', '%'.$request->subject.'%'],['availability', '!=', 'Offline']
+    //     //             ])
+    //     //             ->orWhere([
+    //     //                 ['from', '<=', $request->available_time_1], ['from', '<=', $request->available_time_2], ['from', '<=', $request->available_time_3]
+    //     //             ])
+    //     //             ->get();
                 
-        //         if($lawyers) {
-        //             $lawyersAvailableCount = 0;
-        //             foreach($lawyers as $lawyer) 
-        //             {
-        //                 /** get assigned queries to a lawyer */
-        //                 $queries = Query::where('lawyer_id',$lawyer->id)->get();
-    
-        //                 /** check for conflicts in schedule */
-        //                 $conflicts = 0; //conflict counter
-        //                 foreach($queries as $query) {
-    
-        //                     foreach($requestedDates as $k => $requestedDate) {
-    
-        //                         /** check if a query assigned to a lawyer 
-        //                          *  if requested date is the same, check also if the difference in time is more than 2 hours
-        //                          */
-        //                         if($query->assigned_date==$requestedDate) { 
-        //                             $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
-        //                             if(Carbon\Carbon::parse($query->schedule_date.' '.$query->schedule_time)->diffInHours($requestedTimeItem)<2)
-        //                                 $conflicts++;
-        //                         }
-        //                     }
-        //                 }
-    
-        //                 // if conflict == 0 send this query to the specialized lawyers
-        //                 if($conflicts==0) {
-        //                     $lawyersAvailableCount++;
-        //                     $details = [
-        //                         'title' => 'New Query Match',
-        //                         'ReferenceNumber' => $request->transaction_number,
-        //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-        //                     ];
-        
-        //                     $from = env('MAIL_FROM_ADDRESS');
-        //                     $name = env('MAIL_FROM_NAME');
-        //                     $subject = 'You Have a New Query Match';
-        
-        //                     $to = $lawyer->email;
-        
-        //                     \Mail::to($to)->send(new NotifMail($details));
-        //                 }
-        //             }
-
-        //             if($lawyersAvailableCount==0) //if value is 0, no lawyer time frame is available, so send query to lawyers with specializations with the subject
-        //             {
-        //                 foreach($lawyers as $lawyer) {
-        //                     $details = [
-        //                         'title' => 'New Query Match',
-        //                         'ReferenceNumber' => $request->transaction_number,
-        //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
-        //                     ];
-        
-        //                     $from = env('MAIL_FROM_ADDRESS');
-        //                     $name = env('MAIL_FROM_NAME');
-        //                     $subject = 'You Have a New Query Match';
-        
-        //                     $to = $lawyer->email;
-        
-        //                     \Mail::to($to)->send(new NotifMail($details));
-        //                 }
-        //             }
-
-        //             return null;
-        //         } else //if no lawyers availble assign to general specialization
-        //         {
-        //             $lawyers = User::where('role_id', 2)
-        //             ->where('specialization', 'LIKE', '%General%' )
-        //             ->where('availability', '!=', 'Offline')
-        //             ->get();
-    
-        //             foreach($lawyers as $lawyer) 
-        //             {
-        //                 $query_count = $lawyers->pluck('totalAssigned'); 
-    
-        //                 if($query_count === [0]) 
-        //                 {
-        //                     $assigned = collect($lawyers)->sortBy('created_at')->first(); 
-        //                 }
-        //                 elseif($query_count >= [1] ) 
-        //                 {
-        //                     $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
-        //                 }
-        //                 else 
-        //                 {
-    
-        //                     $filtered = $lawyers->filter(function($value, $key) 
-        //                     {
-        //                         return $value['date_of_last_query'] == NULL; 
-        //                     });
-    
-        //                     $assigned = collect($filtered)->sortBy('created_at')->first(); 
-        //                 }
-    
-        //                 return $assigned->id; 
-        //             }
-        //         }
-        //     }
-        //     else
-        //     {
+    //     //         $requestedDates = [$request->available_date_1,$request->available_date_2,$request->available_date_3]; //save requested dates to  an array
+    //     //         $requestedTimes = [$request->available_time_1,$request->available_time_2,$request->available_time_3]; //save requested time to  an array
                 
-        //         $lawyers = User::where('role_id', 2)
-        //         ->where('specialization', 'LIKE', '%General%' )
-        //         ->where('availability', '!=', 'Offline')
-        //         ->get();
+    //     //         if($lawyers) {
+    //     //             $lawyersAvailableCount = 0;
+    //     //             foreach($lawyers as $lawyer) 
+    //     //             {
+    //     //                 /** get assigned queries to a lawyer */
+    //     //                 $queries = Query::where('lawyer_id',$lawyer->id)->get();
+    
+    //     //                 /** check for conflicts in schedule */
+    //     //                 $conflicts = 0; //conflict counter
+    //     //                 foreach($queries as $query) {
+    
+    //     //                     foreach($requestedDates as $k => $requestedDate) {
+    
+    //     //                         /** check if a query assigned to a lawyer 
+    //     //                          *  if requested date is the same, check also if the difference in time is more than 2 hours
+    //     //                          */
+    //     //                         if($query->assigned_date==$requestedDate) { 
+    //     //                             $requestedTimeItem = Carbon\Carbon::parse($requestedDate.' '.$requestedTimes[$k]);
+    //     //                             if(Carbon\Carbon::parse($query->schedule_date.' '.$query->schedule_time)->diffInHours($requestedTimeItem)<2)
+    //     //                                 $conflicts++;
+    //     //                         }
+    //     //                     }
+    //     //                 }
+    
+    //     //                 // if conflict == 0 send this query to the specialized lawyers
+    //     //                 if($conflicts==0) {
+    //     //                     $lawyersAvailableCount++;
+    //     //                     $details = [
+    //     //                         'title' => 'New Query Match',
+    //     //                         'ReferenceNumber' => $request->transaction_number,
+    //     //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //     //                     ];
+        
+    //     //                     $from = env('MAIL_FROM_ADDRESS');
+    //     //                     $name = env('MAIL_FROM_NAME');
+    //     //                     $subject = 'You Have a New Query Match';
+        
+    //     //                     $to = $lawyer->email;
+        
+    //     //                     \Mail::to($to)->send(new NotifMail($details));
+    //     //                 }
+    //     //             }
 
-        //         foreach($lawyers as $lawyer) 
-        //         {
-        //             $query_count = $lawyers->pluck('totalAssigned'); 
+    //     //             if($lawyersAvailableCount==0) //if value is 0, no lawyer time frame is available, so send query to lawyers with specializations with the subject
+    //     //             {
+    //     //                 foreach($lawyers as $lawyer) {
+    //     //                     $details = [
+    //     //                         'title' => 'New Query Match',
+    //     //                         'ReferenceNumber' => $request->transaction_number,
+    //     //                         'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
+    //     //                     ];
+        
+    //     //                     $from = env('MAIL_FROM_ADDRESS');
+    //     //                     $name = env('MAIL_FROM_NAME');
+    //     //                     $subject = 'You Have a New Query Match';
+        
+    //     //                     $to = $lawyer->email;
+        
+    //     //                     \Mail::to($to)->send(new NotifMail($details));
+    //     //                 }
+    //     //             }
 
-        //             if($query_count === [0]) 
-        //             {
-        //                 $assigned = collect($lawyers)->sortBy('created_at')->first(); 
-        //             }
-        //             elseif($query_count >= [1] ) 
-        //             {
-        //                 $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
-        //             }
-        //             else 
-        //             {
+    //     //             return null;
+    //     //         } else //if no lawyers availble assign to general specialization
+    //     //         {
+    //     //             $lawyers = User::where('role_id', 2)
+    //     //             ->where('specialization', 'LIKE', '%General%' )
+    //     //             ->where('availability', '!=', 'Offline')
+    //     //             ->get();
+    
+    //     //             foreach($lawyers as $lawyer) 
+    //     //             {
+    //     //                 $query_count = $lawyers->pluck('totalAssigned'); 
+    
+    //     //                 if($query_count === [0]) 
+    //     //                 {
+    //     //                     $assigned = collect($lawyers)->sortBy('created_at')->first(); 
+    //     //                 }
+    //     //                 elseif($query_count >= [1] ) 
+    //     //                 {
+    //     //                     $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
+    //     //                 }
+    //     //                 else 
+    //     //                 {
+    
+    //     //                     $filtered = $lawyers->filter(function($value, $key) 
+    //     //                     {
+    //     //                         return $value['date_of_last_query'] == NULL; 
+    //     //                     });
+    
+    //     //                     $assigned = collect($filtered)->sortBy('created_at')->first(); 
+    //     //                 }
+    
+    //     //                 return $assigned->id; 
+    //     //             }
+    //     //         }
+    //     //     }
+    //     //     else
+    //     //     {
+                
+    //     //         $lawyers = User::where('role_id', 2)
+    //     //         ->where('specialization', 'LIKE', '%General%' )
+    //     //         ->where('availability', '!=', 'Offline')
+    //     //         ->get();
 
-        //                 $filtered = $lawyers->filter(function($value, $key) 
-        //                 {
-        //                     return $value['date_of_last_query'] == NULL; 
-        //                 });
+    //     //         foreach($lawyers as $lawyer) 
+    //     //         {
+    //     //             $query_count = $lawyers->pluck('totalAssigned'); 
 
-        //                 $assigned = collect($filtered)->sortBy('created_at')->first(); 
-        //             }
+    //     //             if($query_count === [0]) 
+    //     //             {
+    //     //                 $assigned = collect($lawyers)->sortBy('created_at')->first(); 
+    //     //             }
+    //     //             elseif($query_count >= [1] ) 
+    //     //             {
+    //     //                 $assigned = $lawyers->sortBy('date_of_last_query')->first(); 
+    //     //             }
+    //     //             else 
+    //     //             {
 
-        //             return $assigned->id; 
-        //         }
-        //     }
-        // }
-        return null;
-    }
+    //     //                 $filtered = $lawyers->filter(function($value, $key) 
+    //     //                 {
+    //     //                     return $value['date_of_last_query'] == NULL; 
+    //     //                 });
+
+    //     //                 $assigned = collect($filtered)->sortBy('created_at')->first(); 
+    //     //             }
+
+    //     //             return $assigned->id; 
+    //     //         }
+    //     //     }
+    //     // }
+    //     return null;
+    // }
 
     // public function checkUnassigned() {
         
@@ -667,7 +676,7 @@ class QueryController extends Controller
     public function checkUnassigned() {
         $queries = Query::where('lawyer_id',null)->get();
         foreach($queries as $query) {
-            if(Carbon\Carbon::now()->diffInHours(Carbon\Carbon::parse($query->created_at)>2)) {
+            if(Carbon\Carbon::now()->diffInHours(Carbon\Carbon::parse($query->created_at))>2) {
                 Query::update([
                     'declined_id' => '{declined_id:0}',
                     'status' => 'Declined'
