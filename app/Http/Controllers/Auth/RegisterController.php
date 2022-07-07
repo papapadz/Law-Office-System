@@ -55,15 +55,24 @@ class RegisterController extends Controller
     {
         if($data['role_id']==2) {
             return Validator::make($data, [
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'contact_number' => ['required', 'numeric', 'digits:11'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'first_name' => ['required', 'string', 'alpha', 'max:55'],
+                'middle_name' => ['required', 'string', 'alpha', 'max:55'],
+                'last_name' => ['required', 'string', 'alpha', 'max:55'],
+                'contact_number' => ['required', 'numeric','regex:/(\+?\d{2}?\s?\d{3}\s?\d{3}\s?\d{4})|([0]\d{3}\s?\d{3}\s?\d{4})/'],
+                'birthdate' => ['required','date','before:-18 years'], 
+                'email' => ['required', 'string', 'email', 'max:70', 'unique:users'],
                 'role_id' => ['required', 'exists:roles,id'],
+                'roll_number' => ['required', 'distinct', 'digits_between:1,5'], //validation for roll number
                 'specialization' =>['required_if:role_id,2'],
                 'availability' =>['required_if:role_id,2'],
                 'location' =>['required_if:role_id,2'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'password' => ['required', 'string', 'min:8', 'confirmed', 'required',
+                'string',
+                'min:8',             // must be at least 8 characters in length
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one digit
+                'regex:/[@$!%*#?&]/'], // must contain a special character],
                 'captcha' => ['required','captcha'], /** captcha */
                 'policy' => ['required'], /** require policy input checkbox */
                 
@@ -76,15 +85,23 @@ class RegisterController extends Controller
             ]);
         } else {
             return Validator::make($data, [
-                'first_name' => ['required', 'string', 'max:255'],
-                'last_name' => ['required', 'string', 'max:255'],
-                'contact_number' => ['required', 'numeric', 'digits:11'],
-                'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+                'first_name' => ['required', 'string', 'alpha', 'max:55'],
+                'middle_name' => ['required', 'string', 'alpha', 'max:55'],
+                'last_name' => ['required', 'string', 'alpha', 'max:55'],
+                'contact_number' => ['required', 'numeric','regex:/(\+?\d{2}?\s?\d{3}\s?\d{3}\s?\d{4})|([0]\d{3}\s?\d{3}\s?\d{4})/'],
+                'birthdate' => ['required','date','before:-18 years'], 
+                'email' => ['required', 'string', 'email', 'max:70', 'unique:users'],
                 'role_id' => ['required', 'exists:roles,id'],
                 //'specialization' =>['required_if:role_id,2'],
                 //'availability' =>['required_if:role_id,2'],
                 'location' =>['required_if:role_id,2'],
-                'password' => ['required', 'string', 'min:8', 'confirmed'],
+                'password' => ['required', 'string', 'min:8', 'confirmed', 'required',
+                'string',
+                'min:8',             // must be at least 10 characters in length
+                'regex:/[a-z]/',      // must contain at least one lowercase letter
+                'regex:/[A-Z]/',      // must contain at least one uppercase letter
+                'regex:/[0-9]/',      // must contain at least one digit
+                'regex:/[@$!%*#?&]/'], // must contain a special character],
                 'captcha' => ['required','captcha'], /** captcha */
                 'policy' => ['required'], /** require policy input checkbox */
                 
@@ -122,7 +139,7 @@ class RegisterController extends Controller
         if(isset($data['photo_proof']))
         {
             $photo_proof = null;
-            //$photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
+            $photo_proof = request()->file('photo_proof')->storeOnCloudinary('lawyer_proof/')->getSecurePath();
         }else{
              $photo_proof = null;
         }

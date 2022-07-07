@@ -38,16 +38,16 @@ class ProfileController extends Controller
     public function UpdateProfile(Request $request)
     {
         $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'contact_number' => 'required|numeric|digits:11',
+            'contact_number' => ['required', 'numeric','regex:/(\+?\d{2}?\s?\d{3}\s?\d{3}\s?\d{4})|([0]\d{3}\s?\d{3}\s?\d{4})/'],
+            'email' => ['required', 'string', 'email', 'max:70', 'unique:users'],
+            'availability' =>['required_if:role_id,2'],
         ]);
 
 
         $user = Auth::user();
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
         $user->contact_number = $request->contact_number;
+        $user->email = $request->email;
+        $user->availability = $request->availability;
         $user->save();
 
         toast()->success('Success', 'Profile updated successfully')->position('top-end');
@@ -89,6 +89,7 @@ class ProfileController extends Controller
 
         }else if($role_id == 2)
         {
+
             /** check lawyer availability */
             $category = ['Offline Consultation','Online Consultation'];
             if(Auth::User()->availability=='Offline')
@@ -99,20 +100,20 @@ class ProfileController extends Controller
             /** get pending queries (no lawyers yet) */
             $nullqueries = Query::where([
                 ['status','!=','Declined'],
-                ['subject',Auth::User()->specialization],
                 ['lawyer_id', null]
             ])
             ->whereIn('category',$category)
+            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
             ->get();
             
 
              /** get pending queries assigned to logged in lawyer */
             $assignedqueries = Query::where([
                 ['status','!=','Declined'],
-                ['subject',Auth::User()->specialization],
                 ['lawyer_id', Auth::User()->id] 
             ])
             ->whereIn('category',$category)
+            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
             ->get();
 
             /** merge them */
@@ -120,10 +121,11 @@ class ProfileController extends Controller
             
             $pending_queries = Query::where([
                 ['status','Pending'],
-                ['subject',Auth::User()->specialization],
                 ['lawyer_id', Auth::User()->id] 
-            ])->get();
-            
+            ])
+            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
+            ->get();
+            //dd(Auth::User()->specializations->pluck('id'),$category,Auth::User()->specialization,$assignedqueries,$nullqueries,$queries,$pending_queries);
             // $queries = Query::where('lawyer_id', $user_id)->get();
         }else{
             $queries = Query::with('lawyer')->get();
@@ -431,6 +433,7 @@ class ProfileController extends Controller
         $proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
         
         $queries->proof_photo_url = $proof_photo;
+        $queries->is_payment_verified = 0;
         $queries->save();
 
         $randon_number = random_int(100000, 999999);

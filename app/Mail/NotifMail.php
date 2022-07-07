@@ -32,6 +32,6 @@ class NotifMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('OnCon Notification')->view('query.notification');
+        return $this->subject('OnCon Notification' )->view('query.notification');
     }
 }

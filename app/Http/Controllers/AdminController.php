@@ -47,7 +47,7 @@ class AdminController extends Controller
 
     public function payments()
     {
-        $payments = Query::where('is_payment_verified', '0')->get(); 
+        $payments = Query::where('is_payment_verified', '!=', '1')->get(); 
         return view('admin.payments', compact('payments'));
     }
 
@@ -150,7 +150,7 @@ class AdminController extends Controller
             $details = [
             'title' => 'Feedback Reply',
             'body' => 'Reply from OnCon: ' .$request->reply_message,
-            'ReferenceNumber' => $feedbacks->feedback_number
+            'ReferenceNumber' => $feedbacks->feedback_number 
             ];
 
             $from = env('MAIL_FROM_ADDRESS');
@@ -221,13 +221,13 @@ class AdminController extends Controller
 
             $from = env('MAIL_FROM_ADDRESS');
             $name = env('MAIL_FROM_NAME');
-            $subject = 'Declined Proof of Payment';
+            $subject = 'Approved Proof of Payment';
 
             $to = $queries->client->email;
 
             \Mail::to($to)->send(new NotifMail($details));
 
-            toast()->success('Success', 'All Lawyers has been notified on this Query.')->position('top-end');
+            toast()->success('Success', 'Query successfully assigned! Lawyer is notified.')->position('top-end');
 
             if($queries->lawyer_id) {
                 $details = [
@@ -384,12 +384,20 @@ class AdminController extends Controller
         }elseif($request->input('action') == 'declineProof')
         {
             $queries = Query::where('transaction_number', $request->transaction_number)->first();
-            
+
+            $request->validate([
+                            'reason_of_Declined_Payment' => 'required',
+                    ]);
+
+            $queries->is_payment_verified = '3';
+            $queries->reason_of_Declined_Payment = $request->reason_of_Declined_Payment;
+            $queries->save();
+
 
             $details = [
             'title' => 'Declined Proof of Payment',
             'ReferenceNumber' => $queries->transaction_number,
-            'body' => 'We are sorry to inform that your proof of payment is declined. Please submit another proof of payment to proceed transaction.'
+            'body' => 'We are sorry to inform that your proof of payment is declined. Please submit another proof of payment to proceed transaction. Reason: ' .$queries->reason_of_Declined_Payment
             ];
 
             $from = env('MAIL_FROM_ADDRESS');
@@ -450,7 +458,7 @@ class AdminController extends Controller
                             $lawyersAvailableCount++;
                             $details = [
                                 'title' => 'New Query Match',
-                                'ReferenceNumber' => $transaction_number,
+                                'ReferenceNumber' => $queries->transaction_number,
                                 'body' => 'Please check your OnCon account, we have a new query that you might be interested with.' 
                             ];
                             $from = env('MAIL_FROM_ADDRESS');

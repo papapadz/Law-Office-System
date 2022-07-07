@@ -22,7 +22,6 @@ class Query extends Model implements Auditable
 	{
 		return $this->belongsTo(User::class, 'client_id', 'id');
 	}
-
 	public function specialization() {
 		return $this->hasOne(Specialization::class,'id','subject');
 	}

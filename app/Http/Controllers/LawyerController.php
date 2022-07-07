@@ -225,6 +225,8 @@ class LawyerController extends Controller
             $queries->status = 'Declined';
             $queries->save();
 
+            //call function for algorithm
+
             // $details = [
             //     'title' => 'You Have a New Assigned Query',
             //     'ReferenceNumber' => $request->transaction_number,
