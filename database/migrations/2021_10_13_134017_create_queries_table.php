@@ -44,6 +44,7 @@ class CreateQueriesTable extends Migration
             $table->date('assigned_date')->nullable();
             $table->string('assigned_time')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

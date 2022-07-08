@@ -6,7 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use OwenIt\Auditing\Contracts\Auditable;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 /** used for forgot password */
 use Illuminate\Contracts\Auth\CanResetPassword;
 //
@@ -16,7 +16,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, CanRes
     use \OwenIt\Auditing\Auditable;
 
     use Notifiable;
-
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -36,6 +36,7 @@ class User extends Authenticatable implements MustVerifyEmail, Auditable, CanRes
         'location',
         'roll_number',
         'proof_photo_path',
+        'last_login'
     ];
 
     /**

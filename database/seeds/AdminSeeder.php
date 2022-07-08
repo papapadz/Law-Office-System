@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\User;
+use App\Role;
 use App\Specialization;
 use App\LawyerSpecialization;
 use App\LawyerTimeFrame;
@@ -141,6 +142,11 @@ class AdminSeeder extends Seeder
             ]
         ];
 
+        Role::insert([
+            ['role'=>1,'created_at'=>Carbon::now()->toDateTimeString(),'updated_at'=>Carbon::now()->toDateTimeString()],
+            ['role'=>2,'created_at'=>Carbon::now()->toDateTimeString(),'updated_at'=>Carbon::now()->toDateTimeString()],
+            ['role'=>3,'created_at'=>Carbon::now()->toDateTimeString(),'updated_at'=>Carbon::now()->toDateTimeString()]
+        ]);
         User::insert($users);
 
         /** Specializations */

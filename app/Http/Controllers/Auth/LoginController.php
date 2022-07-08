@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\User;
+use Carbon;
 
 class LoginController extends Controller
 {
@@ -30,6 +32,12 @@ class LoginController extends Controller
 
      public function redirectTo()
     {
+        /** updates the recent logins */
+        if(auth()->user()) {
+            User::where('id',auth()->user()->id)->update([
+                'last_login' => Carbon\Carbon::now()->toDateTimeString()
+            ]);
+        }
        if (auth()->user()->role_id == 3) {
         return 'admin/dashboard';
        }

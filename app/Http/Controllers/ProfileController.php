@@ -103,17 +103,16 @@ class ProfileController extends Controller
                 ['lawyer_id', null]
             ])
             ->whereIn('category',$category)
-            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
+            ->whereIn('subject',Auth::User()->specializations->pluck('specialization_id'))
             ->get();
             
-
              /** get pending queries assigned to logged in lawyer */
             $assignedqueries = Query::where([
                 ['status','!=','Declined'],
                 ['lawyer_id', Auth::User()->id] 
             ])
             ->whereIn('category',$category)
-            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
+            ->whereIn('subject',Auth::User()->specializations->pluck('specialization_id'))
             ->get();
 
             /** merge them */
@@ -123,7 +122,7 @@ class ProfileController extends Controller
                 ['status','Pending'],
                 ['lawyer_id', Auth::User()->id] 
             ])
-            ->whereIn('subject',Auth::User()->specializations->pluck('id'))
+            ->whereIn('subject',Auth::User()->specializations->pluck('specialization_id'))
             ->get();
             //dd(Auth::User()->specializations->pluck('id'),$category,Auth::User()->specialization,$assignedqueries,$nullqueries,$queries,$pending_queries);
             // $queries = Query::where('lawyer_id', $user_id)->get();
@@ -143,13 +142,19 @@ class ProfileController extends Controller
         if($queries) {
             if(Auth::User()->role_id==1 && Auth::User()->id!=$queries->client_id) /** check if query is requeste by the client logged in */
                     return redirect()->route('user.queries')->with('error','Access Denied');
+            
             $feedback_check = Feedback::where('query_id', $queries->id)->count();
 
             $event_check = CalendarEvent::where('query_id', $queries->id)->with('queries')->first();
-
+        
             /** show only available specializations */
-            $availableSpecializations = LawyerSpecialization::select('specialization_id')->groupBy('specialization_id')->get();
-            $specializations = Specialization::where('id','!=',1)->whereIn('id',$availableSpecializations->toArray())->get();
+            //Get Online only
+            if($queries->category=='Online Consultation')
+                $availableSpecializations = LawyerSpecialization::join('users','users.id','lawyer_specializations.user_id')->select('availability','specialization_id')->groupBy('availability','specialization_id')->where('availability', '!=', 'Offline')->get();
+            else 
+                $availableSpecializations = LawyerSpecialization::join('users','users.id','lawyer_specializations.user_id')->select('availability','specialization_id')->groupBy('availability','specialization_id')->where('availability', '!=', 'Online')->get();
+            
+            $specializations = Specialization::where('id','!=',1)->whereIn('id',$availableSpecializations->pluck('specialization_id'))->get();
             
             return view('profile.transaction', compact('queries' , 'feedback_check', 'event_check','specializations'));
         } else // if no query based on the ID, return to previous page
@@ -431,7 +436,8 @@ class ProfileController extends Controller
         $queries = Query::where('transaction_number', $transaction_number)->first();
 
         $proof_photo = request()->file('proof_photo')->storeOnCloudinary('payment_proof/')->getSecurePath();
-        
+        //$proof_photo = 'https://images.unsplash.com/photo-1531804055935-76f44d7c3621?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGhvdG98ZW58MHx8MHx8&w=1000&q=80';
+       
         $queries->proof_photo_url = $proof_photo;
         $queries->is_payment_verified = 0;
         $queries->save();
@@ -480,5 +486,23 @@ class ProfileController extends Controller
 
     }
 
+    public function archiveUsers() {
+        $users = User::where('role_id',1)->get();
+        $activeUsers = 0;
+        $deactivatedUsers = 0;
 
+        foreach($users as $user) {
+            $user_last_login = $user->last_login;
+            $diffInYears = Carbon\Carbon::parse($user_last_login)->diffInYears(Carbon\Carbon::now());
+            if($diffInYears>=5) {
+                Query::where('client_id',$user->id)->delete();
+                User::where('id',$user->id)->delete();
+                $deactivatedUsers++;
+            } else
+                $activeUsers++;
+        }
+
+        echo 'Active Client Accounts: '.$activeUsers.'<br>';
+        echo 'Deactivated Client Accounts: '.$deactivatedUsers;
+    }
 }

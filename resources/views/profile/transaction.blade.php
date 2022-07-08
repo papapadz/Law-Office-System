@@ -606,15 +606,6 @@
                 @endif
                 @endif
 
-                @if($queries->status == 'Declined')
-                <div class="form-group row">
-                    <div class="mx-auto">
-                        <button name="action" value="decline-reschedule" class="btn btn-primary-btn bg-primary-color text-white">
-                            Submit Query Again
-                        </button>
-                    </div>
-                </div>
-                @endif
                 
                 @if($queries->status == 'Complete' && $feedback_check == 0 || $queries->status == 'Approved' && $feedback_check == 0 )
                 <div class="form-group row">
@@ -643,6 +634,14 @@
                     </div>
                 </div>
 
+                @elseif($queries->status == 'Declined')
+                <div class="form-group row">
+                    <div class="mx-auto">
+                        <button name="action" value="decline-reschedule" class="btn btn-primary-btn bg-primary-color text-white">
+                            Submit Query Again
+                        </button>
+                    </div>
+                </div>
                 @else
                 <div class="card-body">
                     <div class="container mx-auto">

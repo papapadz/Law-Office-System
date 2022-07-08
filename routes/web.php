@@ -82,15 +82,15 @@ Route::middleware(['verified'])->group(function (){
 
     /** Added middleware for Clients and Lawyers */
     // LAWYER ENDPOINTS
-    Route::middleware(['lawyer.only'])->group(function() {
+    //Route::middleware(['lawyer.only'])->group(function() {
         
         Route::get('/lawyer/query/{id}', 'LawyerController@LawyerQuery')->name('lawyer.query');
 
         Route::post('/lawyer/query', 'LawyerController@AcceptOnlineQuery')->name('lawyer.accept'); 
-    });
+    //});
     // LAWYER ENDPOINTS
     
-    Route::middleware(['user.only'])->group(function() {
+    //Route::middleware(['user.only'])->group(function() {
         
         Route::get('/user/profile', 'ProfileController@profile')->name('user.profile');
 
@@ -109,7 +109,7 @@ Route::middleware(['verified'])->group(function (){
         Route::post('/payment/upload', 'ProfileController@UploadPayment')->name('payment.upload');
 
         Route::post('/profile/upload', 'ProfileController@UploadProfilePicture')->name('profile.upload');
-    });
+    //});
     
     Route::get('/online/query', 'QueryController@onlinequery')->name('online.query');
 
@@ -150,3 +150,6 @@ Route::get('/reload-captcha', [App\Http\Controllers\Auth\RegisterController::cla
 
 /** call this for checking of unassigned queries */
 Route::get('/query/check-unassigned', 'QueryController@checkUnassigned');
+
+/** call this for checking of inactive clients */
+Route::get('/clients/check-logins', 'ProfileController@archiveUsers');

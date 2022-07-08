@@ -36,6 +36,8 @@ class CreateUsersTable extends Migration
             $table->boolean('is_verified')->default(0);
             $table->string('verification_code')->nullable();
             $table->foreignId('role_id')->default(1)->constrained('roles')->onDelete('cascade');
+            $table->dateTime('last_login')->nullable();
+            $table->softDeletes();
         });
 
 
