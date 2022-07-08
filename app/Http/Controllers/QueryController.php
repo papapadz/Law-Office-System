@@ -684,8 +684,11 @@ class QueryController extends Controller
 
     public function checkUnassigned() {
         $queries = Query::where('lawyer_id',null)->get();
+        $pendingQueries = 0;
+        $resentQueries = 0;
         foreach($queries as $query) {
-            if(Carbon\Carbon::now()->diffInHours(Carbon\Carbon::parse($query->created_at)>2)) {
+            $diffInHours = Carbon\Carbon::now()->diffInHours(Carbon\Carbon::parse($query->created_at));
+            if($diffInHours>2) {
                 Query::update([
                     'declined_id' => '{declined_id:0}',
                     'status' => 'Declined'
@@ -703,8 +706,12 @@ class QueryController extends Controller
                 $toname = $queries->email;
                 
                 \Mail::to($to)->send(new NotifMail($details));
-            }
+                $resentQueries++;
+            } else 
+                $pendingQueries++;
         }
+        echo 'Pending Queries: '.$pendingQueries.'<br>';
+        echo 'Queries resent: '.$resentQueries;
     }
 
     public function print($id) {
