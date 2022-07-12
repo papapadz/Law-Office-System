@@ -689,10 +689,10 @@ class QueryController extends Controller
         foreach($queries as $query) {
             $diffInHours = Carbon\Carbon::now()->diffInHours(Carbon\Carbon::parse($query->created_at));
             if($diffInHours>2) {
-                Query::update([
+                Query::where('id',$query->id)->update([
                     'declined_id' => '{declined_id:0}',
                     'status' => 'Declined'
-                ])->where('id',$query->id);
+                ]);
 
                 $details = [
                     'title' => $query->category . ' Notification',
